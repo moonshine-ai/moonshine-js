@@ -9,9 +9,9 @@ If you are looking for a quick integration with your React application, check ou
 
 _Note: This package is currently in beta, and breaking changes may occur between versions. User feedback and developer contributions are welcome._
 
-## Quickstart
+## Installation
 
-### 1. Include via CDN
+### Option 1. Include via CDN
 
 You can include `moonshine-js` on your site using our CDN-hosted solutions. We provide a few options for rapid integration via CDN:
 
@@ -50,7 +50,7 @@ Now you can specify which text inputs should be speech-enabled and customize the
 
 The manual option also provides options for customizing your layout; [see some examples here](https://github.com/usefulsensors/moonshine-js/blob/main/examples/quickstart/manual.html).
 
-### 2. Install with `npm`
+### Option 2. Install with `npm`
 
 You can also install `moonshine-js` via `npm`, giving you greater control over how you build your application. Just run:
 
