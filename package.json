@@ -1,6 +1,6 @@
 {
   "name": "@usefulsensors/moonshine-js",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "On-device speech-to-text for web applications with Moonshine.",
   "type": "module",
   "scripts": {
@@ -37,7 +37,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/usefulsensors/moonshine.git"
+    "url": "git+https://github.com/usefulsensors/moonshine-js.git"
   },
   "keywords": [
     "asr",
@@ -48,7 +48,7 @@
     "recognition"
   ],
   "bugs": {
-    "url": "https://github.com/usefulsensors/moonshine/issues"
+    "url": "https://github.com/usefulsensors/moonshine-js/issues"
   },
-  "homepage": "https://github.com/usefulsensors/moonshine#readme"
+  "homepage": "https://github.com/usefulsensors/moonshine-js#readme"
 }
