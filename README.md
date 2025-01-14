@@ -3,7 +3,7 @@
 This package provides quick and easy integration of client-side, on-device speech-to-text on web pages and in web applications with Useful Sensors' [Moonshine](https://github.com/usefulsensors/moonshine) models. It includes the following:
 
 - 🌙 **Easy UI integration**: add a single `<script>` that automatically adds speech-to-text to all text inputs on a page, or design your own UI integration in a few easy steps.
-- 🌙 **Simple client-side speech-to-text interfaces**: just import [a single class](https://usefulsensors.github.io/moonshine-js/classes/MoonshineTranscriber.html) to handle user mic permissions, model loading, and audio transcription, or use our [lower-level model implementation](https://usefulsensors.github.io/moonshine-js/classes/MoonshineTranscriber.html) to easily transcribe audio from other sources.
+- 🌙 **Simple client-side speech-to-text interfaces**: just import [a single class](https://usefulsensors.github.io/moonshine-js/classes/MoonshineTranscriber.html) to handle user mic permissions, model loading, and audio transcription, or use our [lower-level model implementation](https://usefulsensors.github.io/moonshine-js/classes/MoonshineModel.html) to easily transcribe audio from other sources.
 
 If you are looking for a quick integration with your React application, check out [`moonshine-react`]().
 
