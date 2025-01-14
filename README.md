@@ -2,8 +2,8 @@
 
 This package provides quick and easy integration of client-side, on-device speech-to-text on web pages and in web applications with Useful Sensors' [Moonshine](https://github.com/usefulsensors/moonshine) models. It includes the following:
 
-- 🌙 **Easy UI integration**: add a single `<script>` that automatically adds speech-to-text to all text inputs on a page, or design your own UI integration in a few easy steps.
-- 🌙 **Simple client-side speech-to-text interfaces**: just import [a single class](https://usefulsensors.github.io/moonshine-js/classes/MoonshineTranscriber.html) to handle user mic permissions, model loading, and audio transcription, or use our [lower-level model implementation](https://usefulsensors.github.io/moonshine-js/classes/MoonshineModel.html) to easily transcribe audio from other sources.
+-   🌙 **Easy UI integration**: add a single `<script>` that automatically adds speech-to-text to all text inputs on a page, or design your own UI integration in a few easy steps.
+-   🌙 **Simple client-side speech-to-text interfaces**: just import [a single class](https://usefulsensors.github.io/moonshine-js/classes/MoonshineTranscriber.html) to handle user mic permissions, model loading, and audio transcription, or use our [lower-level model implementation](https://usefulsensors.github.io/moonshine-js/classes/MoonshineModel.html) to easily transcribe audio from other sources.
 
 If you are looking for a quick integration with your React application, check out [`moonshine-react`]().
 
@@ -12,23 +12,32 @@ _Note: This package is currently in beta, and breaking changes may occur between
 ## Quickstart
 
 ### 1. Include via CDN
+
 You can include `moonshine-js` on your site using our CDN-hosted solutions. We provide a few options for rapid integration via CDN:
 
-#### Auto: Automatically adds a speech-to-text button to all input fields on your page. 
+#### Auto: Automatically adds a speech-to-text button to all input fields on your page.
+
 Include the following `<script>` tag:
 
 ```html
 <head>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.auto.min.js"></script>
+    <script
+        type="module"
+        src="https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.auto.min.js"
+    ></script>
 </head>
 ```
 
-#### Manual: Allows you to customize your speech-to-text UI with your own HTML layout. 
+#### Manual: Allows you to customize your speech-to-text UI with your own HTML layout.
+
 Include the following `<script>` tag:
 
 ```html
 <head>
-    <script type="module" src="https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.manual.min.js"></script>
+    <script
+        type="module"
+        src="https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.manual.min.js"
+    ></script>
 </head>
 ```
 
@@ -42,15 +51,35 @@ Now you can specify which text inputs should be speech-enabled and customize the
 The manual option also provides options for customizing your layout; [see some examples here](https://github.com/usefulsensors/moonshine-js/blob/main/examples/quickstart/manual.html).
 
 ### 2. Install with `npm`
+
 You can also install `moonshine-js` via `npm`, giving you greater control over how you build your application. Just run:
 
 ```
 npm install @usefulsensors/moonshine-js
 ```
 
+You also need to manually download the `.onnx` model weights and the `.wasm` for the ONNX runtime. By default, `moonshine-js` expects these files to be in a `/dist` folder within your project directory, organized as follows:
+
+```
+my-app/
+├─ dist/
+│  ├─ model/
+│  │  ├─ base/
+│  │  │  ├─ *.onnx
+│  │  ├─ tiny/
+│  │  │  ├─ *.onnx
+│  ├─ ort-wasm-simd-threaded.wasm
+├─ node_modules/
+├─ package.json
+├─ ...
+
+```
+
+TODO: How/where to download shrink-rayed model weights and find wasm. Provide a helper script.
+
 There are two key modules provided by `moonshine-js`:
 
-- `MoonshineTranscriber`: handles user mic access, starting/stopping transcription of streaming audio, and transcription generation. 
-- `MoonshineModel`: lower-level implementation of transcription generation from input audio using our ONNX models.
+-   `MoonshineTranscriber`: handles user mic access, starting/stopping transcription of streaming audio, and transcription generation.
+-   `MoonshineModel`: lower-level implementation of transcription generation from input audio using our ONNX models.
 
 [Read the docs](https://usefulsensors.github.io/moonshine-js/) for more information.
