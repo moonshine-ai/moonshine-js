@@ -1,0 +1,54 @@
+{
+  "name": "@usefulsensors/moonshine-js",
+  "version": "0.1.0",
+  "description": "On-device speech-to-text for web applications with Moonshine.",
+  "type": "module",
+  "scripts": {
+    "build": "npx rollup --config",
+    "dev": "npm run build && npx vite"
+  },
+  "author": "Useful Sensors",
+  "license": "MIT",
+  "dependencies": {
+    "llama-tokenizer-js": "^1.2.2",
+    "onnxruntime-web": "^1.20.0"
+  },
+  "devDependencies": {
+    "@huggingface/hub": "^0.19.0",
+    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.1",
+    "rollup": "^4.27.4",
+    "rollup-plugin-import-css": "^3.5.8",
+    "rollup-plugin-svg-import": "^3.0.0",
+    "tslib": "^2.8.1",
+    "typedoc": "^0.27.5",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.3"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/moonshine.min.js"
+    }
+  },
+  "main": "dist/moonshine.min.js",
+  "directories": {
+    "example": "example"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/usefulsensors/moonshine.git"
+  },
+  "keywords": [
+    "asr",
+    "speech-to-text",
+    "on-device",
+    "tinyml",
+    "speech",
+    "recognition"
+  ],
+  "bugs": {
+    "url": "https://github.com/usefulsensors/moonshine/issues"
+  },
+  "homepage": "https://github.com/usefulsensors/moonshine#readme"
+}
