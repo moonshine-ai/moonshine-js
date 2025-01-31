@@ -1,12 +1,16 @@
 import MoonshineModel from "./model";
-import MoonshineTranscriber from "./transcriber";
+import MicrophoneTranscriber from "./microphoneTranscriber";
+import StreamTranscriber from "./streamTranscriber";
+import { TranscriberCallbacks } from "./transcriber";
 import MoonshineElementManager from "./elementManager"
 import { MoonshineSettings, MoonshineLifecycle } from "./constants";
 
 export {
     MoonshineModel,
-    MoonshineTranscriber,
     MoonshineSettings,
     MoonshineLifecycle,
-    MoonshineElementManager
+    MoonshineElementManager,
+    MicrophoneTranscriber,
+    StreamTranscriber,
+    TranscriberCallbacks
 }

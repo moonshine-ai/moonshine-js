@@ -1,4 +1,4 @@
-import MoonshineTranscriber from "./transcriber";
+import MicrophoneTranscriber from "./microphoneTranscriber";
 import { MoonshineLifecycle } from "./constants";
 import styles from "./css/base.css";
 import IdleIcon from "./svg/idle.svg";
@@ -135,7 +135,7 @@ export default class MoonshineElementManager {
                 );
                 MoonshineElementManager.initLifecycleIcons(controlElement);
                 targetElements.forEach((targetElement) => {
-                    var transcriber = new MoonshineTranscriber(
+                    var transcriber = new MicrophoneTranscriber(
                         {
                             onModelLoadStarted() {
                                 // disable other s2t buttons
@@ -190,6 +190,7 @@ export default class MoonshineElementManager {
                         this.modelURL
                     );
                     controlElement.addEventListener("click", () => {
+                        console.log(controlElement)
                         if (!controlElement.attributes["disabled"]) {
                             // if not transcribing, start transcribing
                             if (
