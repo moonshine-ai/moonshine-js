@@ -190,7 +190,6 @@ export default class MoonshineElementManager {
                         this.modelURL
                     );
                     controlElement.addEventListener("click", () => {
-                        console.log(controlElement)
                         if (!controlElement.attributes["disabled"]) {
                             // if not transcribing, start transcribing
                             if (
