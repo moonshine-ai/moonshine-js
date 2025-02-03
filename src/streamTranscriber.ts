@@ -104,6 +104,7 @@ class StreamTranscriber extends Transcriber {
     stop() {
         if (StreamTranscriber.mediaRecorder) {
             StreamTranscriber.mediaRecorder.stop();
+            StreamTranscriber.mediaRecorder.stream.getTracks().forEach((t) => t.stop());
         }
     }
 }
