@@ -6,6 +6,8 @@ interface TranscriberCallbacks {
     onTranscribeStopped: () => any;
 
     onTranscriptionUpdated: (text: string | undefined) => any;
+
+    onTranscriptionCommitted: (text: string | undefined) => any;
 }
 
 const defaultTranscriberCallbacks: TranscriberCallbacks = {
@@ -19,9 +21,10 @@ const defaultTranscriberCallbacks: TranscriberCallbacks = {
         console.log("Transcriber.onTranscribeStopped()");
     },
     onTranscriptionUpdated: function (text: string | undefined) {
-        console.log(
-            "Transcriber.onTranscriptionUpdated(" + text + ")"
-        );
+        console.log("Transcriber.onTranscriptionUpdated(" + text + ")");
+    },
+    onTranscriptionCommitted: function (text: string | undefined) {
+        console.log("Transcriber.onTranscriptionCommitted(" + text + ")");
     },
 };
 
@@ -41,7 +44,4 @@ abstract class Transcriber {
     abstract stop(): void;
 }
 
-export {
-    TranscriberCallbacks,
-    Transcriber
-}
+export { TranscriberCallbacks, Transcriber };

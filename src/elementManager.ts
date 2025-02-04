@@ -183,9 +183,11 @@ export default class MoonshineElementManager {
                                 });
                             },
                             onTranscriptionUpdated(text) {
+                            },
+                            onTranscriptionCommitted(text) {
                                 targetElement.innerHTML = text;
                                 targetElement.value = text;
-                            },
+                            }
                         },
                         this.modelURL
                     );

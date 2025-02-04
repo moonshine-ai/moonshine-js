@@ -2,26 +2,32 @@ import MoonshineModel from "./model";
 import { Transcriber, TranscriberCallbacks } from "./transcriber";
 import { MoonshineSettings } from "./constants";
 
-
 class StreamTranscriber extends Transcriber {
     private static model: MoonshineModel | undefined = undefined;
-    private static mediaRecorder: MediaRecorder | undefined = undefined;
-    private static audioContext: AudioContext | undefined = undefined;
+    private mediaRecorder: MediaRecorder | undefined = undefined;
+    private audioContext: AudioContext | undefined = undefined;
 
     public constructor(
-        stream: MediaStream,
         callbacks: Partial<TranscriberCallbacks> = {},
         modelURL: string
     ) {
-        super(callbacks, modelURL)
-        if (!StreamTranscriber.mediaRecorder) {
-            StreamTranscriber.mediaRecorder = new MediaRecorder(stream);
+        super(callbacks, modelURL);
+    }
+
+    public attachStream(stream: MediaStream) {
+        this.mediaRecorder = new MediaRecorder(stream);
+    }
+
+    public detachStream() {
+        if (this.mediaRecorder) {
+            this.stop();
+            this.mediaRecorder = undefined;
         }
     }
 
     async start() {
-        if (!StreamTranscriber.audioContext) {
-            StreamTranscriber.audioContext = new AudioContext({
+        if (!this.audioContext) {
+            this.audioContext = new AudioContext({
                 sampleRate: 16000,
             });
         }
@@ -35,16 +41,18 @@ class StreamTranscriber extends Transcriber {
             await StreamTranscriber.model.loadModel();
         }
 
-        let audioChunks: Blob[] = [];       // buffer of audio blobs from the user mic
-        let commitChunk: boolean = false;   // flag to indicate whether the next generation should be committed (and buffer cleared)
-        let transcript: string = "";        // running transcript collected from subsequent buffers
+        let audioChunks: Blob[] = []; // buffer of audio blobs from the user mic
+        let commitChunk: boolean = false; // flag to indicate whether the next generation should be committed (and buffer cleared)
+        let transcript: string = ""; // running transcript collected from subsequent buffers
 
         // fires every MOONSHINE_FRAME_SIZE ms
-        StreamTranscriber.mediaRecorder.ondataavailable = (event) => {
-            let bufferSecs = Math.floor((audioChunks.length * MoonshineSettings.FRAME_SIZE) / 1000)
+        this.mediaRecorder.ondataavailable = (event) => {
+            let bufferSecs = Math.floor(
+                (audioChunks.length * MoonshineSettings.FRAME_SIZE) / 1000
+            );
             if (bufferSecs >= MoonshineSettings.MAX_SPEECH_SECS) {
                 // the next transcript should be "committed" and we should erase the buffer afterwards
-                commitChunk = true
+                commitChunk = true;
             }
             audioChunks.push(event.data);
 
@@ -53,7 +61,7 @@ class StreamTranscriber extends Transcriber {
             });
 
             audioBlob.arrayBuffer().then((arrayBuffer) => {
-                StreamTranscriber.audioContext
+                this.audioContext
                     ?.decodeAudioData(arrayBuffer)
                     .then((decoded) => {
                         let floatArray = new Float32Array(decoded.length);
@@ -65,18 +73,24 @@ class StreamTranscriber extends Transcriber {
                             ?.generate(floatArray)
                             .then((text) => {
                                 if (text) {
+                                    this.callbacks.onTranscriptionUpdated(
+                                        text
+                                    );
                                     if (commitChunk) {
-                                        transcript = transcript + " " + text
-                                        this.callbacks.onTranscriptionUpdated(transcript);
+                                        transcript = transcript + " " + text;
+                                        this.callbacks.onTranscriptionCommitted(
+                                            transcript
+                                        );
 
-                                        let headerBlob = audioChunks[0]
+                                        let headerBlob = audioChunks[0];
                                         // TODO lookback frames?
-                                        audioChunks = []
-                                        audioChunks.push(headerBlob)
-                                        commitChunk = false
-                                    }
-                                    else {
-                                        this.callbacks.onTranscriptionUpdated(transcript + " " + text);
+                                        audioChunks = [];
+                                        audioChunks.push(headerBlob);
+                                        commitChunk = false;
+                                    } else {
+                                        this.callbacks.onTranscriptionCommitted(
+                                            transcript + " " + text
+                                        );
                                     }
                                 }
                             });
@@ -85,15 +99,18 @@ class StreamTranscriber extends Transcriber {
             });
         };
 
-        StreamTranscriber.mediaRecorder.start(MoonshineSettings.FRAME_SIZE);
+        this.mediaRecorder.start(MoonshineSettings.FRAME_SIZE);
         this.callbacks.onTranscribeStarted();
 
-        const recorderTimeOut = setTimeout(() => {
-            this.stop();
-        }, MoonshineSettings.MAX_RECORD_MS);
+        let recorderTimeout = undefined;
+        if (MoonshineSettings.MAX_RECORD_MS) {
+            recorderTimeout = setTimeout(() => {
+                this.stop();
+            }, MoonshineSettings.MAX_RECORD_MS);
+        }
 
-        StreamTranscriber.mediaRecorder.onstop = () => {
-            clearTimeout(recorderTimeOut);
+        this.mediaRecorder.onstop = () => {
+            if (recorderTimeout) clearTimeout(recorderTimeout);
             this.callbacks.onTranscribeStopped();
         };
     }
@@ -102,9 +119,9 @@ class StreamTranscriber extends Transcriber {
      * Stops transcription.
      */
     stop() {
-        if (StreamTranscriber.mediaRecorder) {
-            StreamTranscriber.mediaRecorder.stop();
-            StreamTranscriber.mediaRecorder.stream.getTracks().forEach((t) => t.stop());
+        if (this.mediaRecorder) {
+            this.mediaRecorder.stop();
+            // this.mediaRecorder.stream.getTracks().forEach((t) => t.stop());
         }
     }
 }

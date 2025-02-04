@@ -76,7 +76,8 @@ class MicrophoneTranscriber extends Transcriber {
             const stream = await navigator.mediaDevices.getUserMedia({
                 audio: true,
             });
-            this.transcriber = new StreamTranscriber(stream, this.callbacks, Transcriber.modelURL)
+            this.transcriber = new StreamTranscriber(this.callbacks, Transcriber.modelURL)
+            this.transcriber.attachStream(stream)
         }
         this.transcriber.start()
     }
