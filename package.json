@@ -11,7 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "llama-tokenizer-js": "^1.2.2",
-    "onnxruntime-web": "^1.20.0"
+    "onnxruntime-web": "^1.21.0-dev.20250129-80bc1d25f0"
   },
   "devDependencies": {
     "@huggingface/hub": "^0.19.0",

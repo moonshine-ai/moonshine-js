@@ -76,7 +76,7 @@ export default class MoonshineElementManager {
 
     /**
      * Injects HTML elements to automatically add speech-to-text to a page.
-     * 
+     *
      * @param inputAreaSelectors (Optional) a list of CSS selectors that point to elements that should have speech-to-text capabilities added to them. The default value for this argument points to a general-purpose set of input types, but this can be overridden to point to, e.g., specific elements by id, or elements that are not input fields but we might otherwise want to output transcriptions to.
      * @param postInjectionFunction (Optional) a function to run after injecting elements. This is useful when we need to apply additional dynamic styling to the elements using, e.g., computed dimensions of elements as they are rendered on the page. Takes the injected button element and target input element as arguments.
      */
@@ -117,8 +117,8 @@ export default class MoonshineElementManager {
     }
 
     /**
-     * Initializes speech-to-text capabilities for all elements on the page that are pointed to by a button or other element with a `data-moonshine-target` specified. 
-     * 
+     * Initializes speech-to-text capabilities for all elements on the page that are pointed to by a button or other element with a `data-moonshine-target` specified.
+     *
      * This should be run in both the "custom" case (where we've manually added button elements in the page that point to other elements to output to) and in the "automatic" case (where we've automatically injected buttons in the DOM and set their targets to other elements to output to).
      */
     public initControlElements() {
@@ -152,8 +152,7 @@ export default class MoonshineElementManager {
                                 moonshineControlElements.forEach((element) => {
                                     if (element != controlElement) {
                                         element.setAttribute("disabled", "");
-                                    }
-                                    else {
+                                    } else {
                                         element.removeAttribute("disabled");
                                     }
                                 });
@@ -182,12 +181,11 @@ export default class MoonshineElementManager {
                                     }
                                 });
                             },
-                            onTranscriptionUpdated(text) {
-                            },
+                            onTranscriptionUpdated(text) {},
                             onTranscriptionCommitted(text) {
                                 targetElement.innerHTML = text;
                                 targetElement.value = text;
-                            }
+                            },
                         },
                         this.modelURL
                     );
@@ -195,7 +193,9 @@ export default class MoonshineElementManager {
                         if (!controlElement.attributes["disabled"]) {
                             // if not transcribing, start transcribing
                             if (
-                                !controlElement.attributes["data-moonshine-active"]
+                                !controlElement.attributes[
+                                    "data-moonshine-active"
+                                ]
                             ) {
                                 transcriber.start();
                             }
@@ -219,8 +219,8 @@ export default class MoonshineElementManager {
     }
 
     /**
-     * Injects HTML for the lifecycle icons (loading, transcribing, idle) of a speech-to-text button. 
-     * 
+     * Injects HTML for the lifecycle icons (loading, transcribing, idle) of a speech-to-text button.
+     *
      * If icon overrides have been specified on the page with the `data-moonshine-{loading,transcribing,idle}` attribute, use this; otherwise, use the icons returned by {@link getLifecycleInnerHTML}
      * @param parentButton The button element to inject icon HTML
      */
@@ -247,7 +247,7 @@ export default class MoonshineElementManager {
 
     /**
      * Displays the appropriate icon for the given lifecycle step (i.e., idle, loading, transcribing) on the given button.
-     * 
+     *
      * @param parentButton The element to show the specified icon for
      * @param lifecycle The {@link MoonshineLifecycle} to display the icon for
      */
@@ -275,8 +275,8 @@ export default class MoonshineElementManager {
 
     /**
      * Get the appropriate icon HTML for the given step of the lifecycle. If a `data-moonshine-template` button is specified somewhere on the page (which includes the HTML that should be globally applied to all speech-to-text buttons), the content of that element is used; otherwise, the default icons are used.
-     * @param lifecycle the {@link MoonshineLifecycle} step to get the icon HTML for
-     * @returns a string of inline HTML for the icon
+     * @param lifecycle The {@link MoonshineLifecycle} step to get the icon HTML for
+     * @returns A string of inline HTML for the icon
      */
     static getLifecycleInnerHTML(lifecycle: MoonshineLifecycle) {
         const globalDefinitionElement = document.querySelector(

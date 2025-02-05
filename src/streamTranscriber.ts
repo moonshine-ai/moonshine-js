@@ -3,10 +3,56 @@ import { Transcriber, TranscriberCallbacks } from "./transcriber";
 import { MoonshineSettings } from "./constants";
 
 class StreamTranscriber extends Transcriber {
-    private static model: MoonshineModel | undefined = undefined;
     private mediaRecorder: MediaRecorder | undefined = undefined;
     private audioContext: AudioContext | undefined = undefined;
 
+    /**
+     * Creates a transcriber for transcribing a MediaStream from any source. After creating the {@link StreamTranscriber}, you must invoke
+     * {@link StreamTranscriber.attachStream} to provide a MediaStream that you want to transcribe.
+     *
+     * @param callbacks A set of optional {@link TranscriberCallbacks} used to trigger behavior at different steps of the
+     * transcription lifecycle.
+     * @param modelURL The URL that the underlying {@link MoonshineModel} weights should be loaded from,
+     * relative to {@link MoonshineSettings.BASE_ASSET_PATH}
+     *
+     * @example
+     * This basic example demonstrates the use of the transcriber with custom callbacks:
+     *
+     * ``` ts
+     * import StreamTranscriber from "@usefulsensors/moonshine";
+     *
+     * var transcriber = new StreamTranscriber(
+     *      {
+     *          onModelLoadStarted() {
+     *              console.log("onModelLoadStarted()");
+     *          },
+     *          onTranscribeStarted() {
+     *              console.log("onTranscribeStarted()");
+     *          },
+     *          onTranscribeStopped() {
+     *              console.log("onTranscribeStopped()");
+     *          },
+     *          onTranscriptionUpdated(text: string | undefined) {
+     *              console.log(
+     *                  "onTranscriptionUpdated(" + text + ")"
+     *              );
+     *          },
+     *          onTranscriptionCommitted(text: string | undefined) {
+     *              console.log(
+     *                  "onTranscriptionCommitted(" + text + ")"
+     *              );
+     *          },
+     *      },
+     *      "model/tiny"
+     * );
+     *
+     * // Get a MediaStream from somewhere (user mic, active tab, an <audio> element, WebRTC source, etc.)
+     * ...
+     *
+     * transcriber.attachStream(stream);
+     * transcriber.start();
+     * ```
+     */
     public constructor(
         callbacks: Partial<TranscriberCallbacks> = {},
         modelURL: string
@@ -14,17 +60,33 @@ class StreamTranscriber extends Transcriber {
         super(callbacks, modelURL);
     }
 
+    /**
+     * Attaches a MediaStream to this {@link StreamTranscriber} for transcription. A MediaStream must be attached before
+     * starting transcription.
+     * 
+     * @param stream A MediaStream to transcribe
+     */
     public attachStream(stream: MediaStream) {
         this.mediaRecorder = new MediaRecorder(stream);
     }
 
+    /**
+     * 
+     */
     public detachStream() {
         if (this.mediaRecorder) {
             this.stop();
+            this.mediaRecorder.stream.getTracks().forEach((t) => t.stop());
             this.mediaRecorder = undefined;
         }
     }
 
+    /**
+     * Starts transcription.
+     *
+     * Note that the {@link StreamTranscriber} must have a MediaStream attached via {@link StreamTranscriber.attachStream} before
+     * starting transcription.
+     */
     async start() {
         if (!this.audioContext) {
             this.audioContext = new AudioContext({
@@ -33,12 +95,8 @@ class StreamTranscriber extends Transcriber {
         }
 
         // load model if not loaded
-        if (!StreamTranscriber.model) {
-            this.callbacks.onModelLoadStarted();
-            StreamTranscriber.model = new MoonshineModel(
-                StreamTranscriber.modelURL
-            );
-            await StreamTranscriber.model.loadModel();
+        if (!Transcriber.model.isLoaded()) {
+            await super.loadModel()
         }
 
         let audioChunks: Blob[] = []; // buffer of audio blobs from the user mic
@@ -69,13 +127,11 @@ class StreamTranscriber extends Transcriber {
                             floatArray = floatArray.subarray(0, 16000 * 30);
                         }
                         decoded.copyFromChannel(floatArray, 0);
-                        StreamTranscriber.model
+                        Transcriber.model
                             ?.generate(floatArray)
                             .then((text) => {
                                 if (text) {
-                                    this.callbacks.onTranscriptionUpdated(
-                                        text
-                                    );
+                                    this.callbacks.onTranscriptionUpdated(text);
                                     if (commitChunk) {
                                         transcript = transcript + " " + text;
                                         this.callbacks.onTranscriptionCommitted(
@@ -121,7 +177,6 @@ class StreamTranscriber extends Transcriber {
     stop() {
         if (this.mediaRecorder) {
             this.mediaRecorder.stop();
-            // this.mediaRecorder.stream.getTracks().forEach((t) => t.stop());
         }
     }
 }

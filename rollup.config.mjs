@@ -15,7 +15,7 @@ const plugins = [
 ];
 
 export default [
-    // moonshine module for development/npm
+    // core moonshine module
     {
         input: "src/index.ts",
         output: {

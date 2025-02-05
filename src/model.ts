@@ -23,7 +23,7 @@ export default class MoonshineModel {
     /**
      * Create (but do not load) a new MoonshineModel for inference.
      *
-     * @param modelURL - a string (relative to {@link MoonshineSettings.BASE_ASSET_PATH}) where the `.onnx` model weights are located.
+     * @param modelURL A string (relative to {@link MoonshineSettings.BASE_ASSET_PATH}) where the `.onnx` model weights are located.
      *
      * @remarks Creating a MoonshineModel has the side effect of setting the path to the `onnxruntime-web` `.wasm` to the {@link MoonshineSettings.BASE_ASSET_PATH}
      */
@@ -54,6 +54,7 @@ export default class MoonshineModel {
         let sessionOption;
 
         // check for webgpu support
+        // @ts-expect-error
         if (!!navigator.gpu) {
             sessionOption = {
                 executionProviders: ["webgpu"],
@@ -104,13 +105,17 @@ export default class MoonshineModel {
         );
     }
 
+    public isLoaded() {
+        return (this.model.encoder && this.model.decoder);
+    }
+
     /**
      * Generate a transcription of the passed audio.
-     * @param audio - a Float32Array containing raw audio samples from an audio source (e.g., a wav file, or a user's microphone)
-     * @returns - a Promise that resolves with the generated transcription.
+     * @param audio A Float32Array containing raw audio samples from an audio source (e.g., a wav file, or a user's microphone)
+     * @returns A Promise that resolves with the generated transcription.
      */
     public async generate(audio: Float32Array) {
-        if (this.model.encoder && this.model.decoder) {
+        if (this.isLoaded()) {
             const maxLen = Math.trunc((audio.length / 16000) * 6);
 
             const encoderOutput = await this.model.encoder.run({
@@ -145,6 +150,7 @@ export default class MoonshineModel {
 
             for (let i = 0; i < maxLen; i++) {
                 var decoderInput = {
+                    // @ts-expect-error
                     input_ids: new ort.Tensor("int64", inputIDs, [
                         1,
                         inputIDs.length,
