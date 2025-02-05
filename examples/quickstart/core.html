@@ -21,9 +21,9 @@
             </audio>
         </div>
         <script type="module">
-            import { StreamTranscriber, MoonshineSettings } from "/dist/moonshine.min.js"
+            import { StreamTranscriber, MoonshineSettings } from "https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.min.js"
             // Set the asset path to the CDN root (so the models are fetched from there)
-            // MoonshineSettings.BASE_ASSET_PATH = "https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/";
+            MoonshineSettings.BASE_ASSET_PATH = "https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/";
 
             document.addEventListener("DOMContentLoaded", () => {
                 var transcriber = new StreamTranscriber(
