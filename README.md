@@ -72,7 +72,10 @@ You can also import modules directly from the CDN-hosted core library:
     <body>
         ...
         <script type="module">
-            import { StreamTranscriber } from "https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.min.js"
+            import { StreamTranscriber, MoonshineSettings } from "https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.min.js"
+            // Set the asset path to the CDN root (so the models are fetched from there)
+            MoonshineSettings.BASE_ASSET_PATH = "https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/";
+
             var transcriber = new StreamTranscriber(
                 {
                     onModelLoadStarted() {

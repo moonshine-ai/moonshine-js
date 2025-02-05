@@ -1,6 +1,6 @@
 {
   "name": "@usefulsensors/moonshine-js",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "On-device speech-to-text for web applications with Moonshine.",
   "type": "module",
   "scripts": {
