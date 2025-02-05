@@ -27,7 +27,7 @@ export default class MoonshineModel {
      *
      * @remarks Creating a MoonshineModel has the side effect of setting the path to the `onnxruntime-web` `.wasm` to the {@link MoonshineSettings.BASE_ASSET_PATH}
      */
-    public constructor(modelURL: string, precision: string = "float") {
+    public constructor(modelURL: string, precision: string = "quantized") {
         this.modelURL = MoonshineSettings.BASE_ASSET_PATH + modelURL;
         this.precision = precision;
         ort.env.wasm.wasmPaths = MoonshineSettings.BASE_ASSET_PATH;
