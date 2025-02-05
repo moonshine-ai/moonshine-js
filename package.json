@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "npx rollup --config",
-    "dev": "npm run build && npx vite"
+    "dev": "npm run build && npx vite",
+    "docs": "npx typedoc src/index.ts"
   },
   "author": "Useful Sensors",
   "license": "MIT",
