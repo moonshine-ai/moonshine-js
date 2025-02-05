@@ -1,8 +1,6 @@
 {
-  "name": "moonshine-browser-extension",
+  "name": "moonshine-browser-speech-input",
   "version": "1.0.0",
-  "description": "A browser extension that adds an on-device speech-to-text option to text inputs on web pages as you browse.",
-  "main": "dist/moonshine.extension.min.js",
   "scripts": {
     "build": "npx rollup --config"
   },

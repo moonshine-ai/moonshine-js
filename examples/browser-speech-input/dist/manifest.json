@@ -6,7 +6,7 @@
   "content_scripts": [
     {
       "js": [
-        "moonshine.extension.min.js"
+        "content.js"
       ],
       "matches": [
         "<all_urls>"

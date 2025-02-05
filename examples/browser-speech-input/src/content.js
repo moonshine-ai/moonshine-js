@@ -1,6 +1,4 @@
-// @ts-nocheck
-
-import { MoonshineSettings } from "@usefulsensors/moonshine";
+import { MoonshineSettings } from "@usefulsensors/moonshine-js";
 
 if (typeof chrome !== "undefined") {
     if (typeof browser !== "undefined") {
@@ -12,13 +10,13 @@ if (typeof chrome !== "undefined") {
     }
 }
 
-import { MoonshineElementManager } from "@usefulsensors/moonshine";
+import { MoonshineElementManager } from "@usefulsensors/moonshine-js";
 
 chrome.storage.sync.get({ model: "tiny", enableEverywhere: false }, (settings) => {
     if (settings.enableEverywhere || window.location.host.includes("chatgpt.com") || window.location.host.includes("claude.ai") ) {
-        var inputAreaSelectors: Array<string> | undefined = undefined;
-        var styleSheet: string | undefined = undefined;
-        var postInjectionFunction: Function | undefined = undefined;
+        var inputAreaSelectors = undefined;
+        var styleSheet = undefined;
+        var postInjectionFunction = undefined;
 
         switch (window.location.host) {
             case "chatgpt.com":

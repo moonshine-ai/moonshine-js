@@ -1,4 +1,4 @@
-# MoonshineJS Browser Extension
+# moonshine-js/browser-speech-input
 
 Add on-device speech-to-text capabilities to ChatGPT and Claude (with an experimental option to add it everywhere!)
 

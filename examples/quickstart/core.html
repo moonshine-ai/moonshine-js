@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+    <head>
+        <title>useful-moonshine-web</title>
+    </head>
+    <style>
+        .test-container {
+            width: 512px;
+        }
+        .test-input {
+            width: 100%;
+            height: 128px;
+        }
+    </style>
+    <body>
+        <p>Demonstrating custom use of the moonshine-js core script.</p>
+        <h1 id="transcript"></h1>
+        <div class="test-container">
+            <audio>
+                <source src="/examples/quickstart/assets/beckett.wav" type="audio/wav">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+        <script type="module">
+            import { StreamTranscriber } from "https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.min.js"
+
+            document.addEventListener("DOMContentLoaded", () => {
+                var transcriber = new StreamTranscriber(
+                    {
+                        onModelLoadStarted() {
+                            document.getElementById("transcript").innerText = "Loading model..."
+                        },
+                        onModelLoaded() {
+                            document.getElementById("transcript").innerText = "Model loaded; press play to transcribe."
+                            document.querySelector("audio").setAttribute("controls", "")
+                        },
+                        onTranscribeStarted() {
+                            console.log("onTranscribeStarted()");
+                        },
+                        onTranscribeStopped() {
+                            console.log("onTranscribeStopped()");
+                        },
+                        onTranscriptionUpdated(text) {
+                            console.log(
+                                "onTranscriptionUpdated(" + text + ")"
+                            );
+                        },
+                        onTranscriptionCommitted(text) {
+                            document.getElementById("transcript").innerText = text
+                        },
+                    },
+                    "model/tiny"
+                );
+                transcriber.loadModel() // preload the model (don't wait for transcription to start)
+
+                const audio = document.querySelector("audio");
+
+                audio.addEventListener("playing", () => {
+                    const context = new AudioContext();
+
+                    // source: audio element
+                    const source = context.createMediaElementSource(audio);
+                    // destination: a new MediaStream to pass to the StreamTransciber
+                    const destination = context.createMediaStreamDestination();
+                    const stream = destination.stream
+
+                    // connect audio element to browser audio context (so we still hear the audio)
+                    source.connect(context.destination);
+                    // connect audio element to our new MediaStream
+                    source.connect(destination)
+
+                    transcriber.attachStream(stream);
+                    transcriber.start();
+                });
+
+                audio.addEventListener("ended", () => {
+                    transcriber.detachStream();
+                });
+
+                audio.addEventListener("pause", () => {
+                    transcriber.detachStream();
+                });
+        });
+        </script>
+    </body>
+</html>
