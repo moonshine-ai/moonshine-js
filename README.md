@@ -101,7 +101,7 @@ You can also import modules directly from the CDN-hosted core library:
             // Get a MediaStream from some source...
             ...
 
-            // Attach the stresam to the transcriber and start transcription
+            // Attach the stream to the transcriber and start transcription
             transcriber.attachStream(mediaStream);
             transcriber.start();
         </script>
