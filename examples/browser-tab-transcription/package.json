@@ -12,6 +12,6 @@
     "rollup": "^4.28.1"
   },
   "dependencies": {
-    "@usefulsensors/moonshine-js": "file:../.."
+    "@usefulsensors/moonshine-js": "^0.1.4"
   }
 }

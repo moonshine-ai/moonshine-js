@@ -4,7 +4,7 @@
   "description": "On-device speech-to-text for web applications with Moonshine.",
   "type": "module",
   "scripts": {
-    "build": "npx rollup --config",
+    "build": "npx rollup --config && npm run docs",
     "dev": "npm run build && npx vite",
     "docs": "npx typedoc src/index.ts"
   },

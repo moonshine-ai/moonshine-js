@@ -54,13 +54,12 @@ export default class MoonshineModel {
         let sessionOption;
 
         // check for webgpu support
-        // @ts-expect-error
-        if (!!navigator.gpu) {
-            sessionOption = {
-                executionProviders: ["webgpu"],
-                preferredOutputLocation: "gpu-buffer",
-            };
-        }
+        // if (!!navigator.gpu) {
+        //     sessionOption = {
+        //         executionProviders: ["webgpu"],
+        //         preferredOutputLocation: "gpu-buffer",
+        //     };
+        // }
         // otherwise check for webgl support
         // NOTE onnxruntime-web does not support the necessary ops for moonshine on webgl
         // else if (
@@ -76,11 +75,11 @@ export default class MoonshineModel {
         //     };
         // }
         // otherwise use cpu
-        else {
-            sessionOption = {
-                executionProviders: ["wasm", "cpu"],
-            };
-        }
+        //else {
+        sessionOption = {
+            executionProviders: ["wasm", "cpu"],
+        };
+        //}
         return sessionOption;
     }
 

@@ -16,7 +16,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "*.wasm",
+        "ort-wasm-simd-threaded.jsep.wasm",
+        "ort-wasm-simd-threaded.jsep.mjs",
         "*.onnx"
       ],
       "matches": [

@@ -14,7 +14,7 @@ We provide three options for building your application: _auto_, _manual_, and _c
 There are a few key modules provided by the `moonshine-js` core library:
 
 -   `StreamTranscriber`: provides transcription of a [MediaStream](https://developer.mozilla.org/en-US/docs/Web/API/MediaStream), allowing you to transcribe audio from many sources.
--   `MicrophoneTranscriber`: handles user mic access, starting/stopping transcription of streaming audio, and transcription generation.
+-   `MicrophoneTranscriber`: provides transcription of user microphone input.
 -   `MoonshineModel`: lower-level implementation of transcription generation from input audio (as a [Float32Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array)) using our ONNX models.
 
 [Read the docs](https://usefulsensors.github.io/moonshine-js/) for more information.

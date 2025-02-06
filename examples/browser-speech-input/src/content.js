@@ -1,14 +1,5 @@
 import { MoonshineSettings } from "@usefulsensors/moonshine-js";
-
-if (typeof chrome !== "undefined") {
-    if (typeof browser !== "undefined") {
-        // firefox
-        MoonshineSettings.BASE_ASSET_PATH = browser.runtime.getURL("/");
-    } else {
-        // chrome
-        MoonshineSettings.BASE_ASSET_PATH = chrome.runtime.getURL("/");
-    }
-}
+MoonshineSettings.BASE_ASSET_PATH = chrome.runtime.getURL("/");
 
 import { MoonshineElementManager } from "@usefulsensors/moonshine-js";
 

@@ -20,7 +20,7 @@ class MicrophoneTranscriber extends StreamTranscriber {
      * This basic example demonstrates the use of the transcriber with custom callbacks:
      *
      * ``` ts
-     * import MicrophoneTranscriber from "@usefulsensors/moonshine";
+     * import MicrophoneTranscriber from "@usefulsensors/moonshine-js";
      *
      * var transcriber = new MicrophoneTranscriber(
      *      {
