@@ -30,12 +30,10 @@ You can include `moonshine-js` via CDN, or install it with `npm`.
 Include the following `<script>` tag:
 
 ```html
-<head>
-    <script
-        type="module"
-        src="https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.auto.min.js"
-    ></script>
-</head>
+<script
+    type="module"
+    src="https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.auto.min.js"
+></script>
 ```
 
 #### Manual: Customize speech-to-text inputs with your own HTML.
@@ -43,12 +41,10 @@ Include the following `<script>` tag:
 Include the following `<script>` tag:
 
 ```html
-<head>
-    <script
-        type="module"
-        src="https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.manual.min.js"
-    ></script>
-</head>
+<script
+    type="module"
+    src="https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.manual.min.js"
+></script>
 ```
 
 Now you can specify which text inputs should be speech-enabled and customize their appearance. Add a `data-moonshine-target` attribute to any clickable element that you want to trigger speech-to-text, and set its value to a CSS selector of the element(s) that should be updated with the transcription output. For example:

@@ -20,6 +20,8 @@ export default class MoonshineModel {
     private decoderStartTokenID: number = 1;
     private eosTokenID: number = 2;
 
+    private lastLatency: number | undefined = undefined;
+
     /**
      * Create (but do not load) a new MoonshineModel for inference.
      *
@@ -84,6 +86,38 @@ export default class MoonshineModel {
     }
 
     /**
+     * Tests the inference latency of the current environment. This is useful for determining the appropriate
+     * {@link MoonshineSettings.FRAME_SIZE} and {@link MoonshineSettings.MAX_SPEECH_SECS} for a given execution environment.
+     *
+     * @param sampleSize (Optional) The number of samples to use for computing the benchmark
+     *
+     * @returns The average inference latency (in ms) over the number of samples taken.
+     */
+    public async benchmarkExecutionEnvironment(
+        sampleSize: number = 10
+    ): Promise<number> {
+        var samples = [];
+        const noiseBuffer = new Float32Array(16000);
+        for (var i = 0; i < sampleSize; i++) {
+            // fill the buffer with noise
+            for (let j = 0; j < length; j++) {
+                noiseBuffer[j] = Math.random() * 2 - 1;
+            }
+            await this.generate(noiseBuffer);
+            samples.push(this.lastLatency);
+        }
+        return samples.reduce((sum, num) => sum + num, 0) / sampleSize;
+    }
+
+    /**
+     * Returns the latency (in ms) of the last call to {@link MoonshineModel.generate}
+     * @returns A latency reading (in ms)
+     */
+    public getLatency(): number {
+        return this.lastLatency;
+    }
+
+    /**
      * Load the model weights.
      */
     public async loadModel() {
@@ -104,8 +138,12 @@ export default class MoonshineModel {
         );
     }
 
-    public isLoaded() {
-        return (this.model.encoder && this.model.decoder);
+    /**
+     * Returns whether or not the model weights have been loaded.
+     * @returns true if the model is loaded, false if not.
+     */
+    public isLoaded(): boolean {
+        return this.model.encoder && this.model.decoder;
     }
 
     /**
@@ -113,8 +151,9 @@ export default class MoonshineModel {
      * @param audio A Float32Array containing raw audio samples from an audio source (e.g., a wav file, or a user's microphone)
      * @returns A Promise that resolves with the generated transcription.
      */
-    public async generate(audio: Float32Array) {
+    public async generate(audio: Float32Array): Promise<string> {
         if (this.isLoaded()) {
+            const t0 = performance.now();
             const maxLen = Math.trunc((audio.length / 16000) * 6);
 
             const encoderOutput = await this.model.encoder.run({
@@ -178,6 +217,7 @@ export default class MoonshineModel {
                     }
                 });
             }
+            this.lastLatency = performance.now() - t0;
             return llamaTokenizer.decode(tokens.slice(0, -1));
         } else {
             console.warn(
