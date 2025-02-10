@@ -15,7 +15,7 @@ import MoonshineModel from "./model";
  *
  * @property onTranscriptionUpdated(text) - called every {@link MoonshineSettings.FRAME_SIZE} milliseconds while
  * transcription is active. Use this callback when you don't need long-running transcription - you only care about
- * the most-recent transcription output.
+ * the most-recent transcription output. Note that the transcription output may be empty in cases where no speech was detected.
  *
  * @property onTranscriptionCommitted(text) - called every {@link MoonshineSettings.FRAME_SIZE} milliseconds while
  * transcription is active, and every {@link MoonshineSettings.MAX_SPEECH_SECS} when the transcription is "committed",

@@ -139,10 +139,10 @@ class StreamTranscriber extends Transcriber {
                             Transcriber.model
                                 ?.generate(floatArray)
                                 .then((text) => {
+                                    this.callbacks.onTranscriptionUpdated(
+                                        text
+                                    );
                                     if (text) {
-                                        this.callbacks.onTranscriptionUpdated(
-                                            text
-                                        );
                                         if (commitChunk) {
                                             transcript =
                                                 transcript + " " + text;

@@ -110,7 +110,7 @@ export default class MoonshineModel {
     }
 
     /**
-     * Returns the latency (in ms) of the last call to {@link MoonshineModel.generate}
+     * Returns the latency (in ms) of the most recent call to {@link MoonshineModel.generate}
      * @returns A latency reading (in ms)
      */
     public getLatency(): number {
@@ -224,5 +224,6 @@ export default class MoonshineModel {
                 "MoonshineModel.generate(): Tried to call generate before the model was loaded."
             );
         }
+        return undefined;
     }
 }
