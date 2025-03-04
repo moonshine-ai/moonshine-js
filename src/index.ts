@@ -4,6 +4,7 @@ import StreamTranscriber from "./streamTranscriber";
 import { TranscriberCallbacks } from "./transcriber";
 import MoonshineElementManager from "./elementManager"
 import { MoonshineSettings, MoonshineLifecycle } from "./constants";
+import { VoiceController, KeywordSpotter, IntentClassifier } from "./voiceController";
 
 export {
     MoonshineModel,
@@ -12,5 +13,8 @@ export {
     MoonshineElementManager,
     MicrophoneTranscriber,
     StreamTranscriber,
-    TranscriberCallbacks
+    TranscriberCallbacks,
+    VoiceController,
+    KeywordSpotter,
+    IntentClassifier
 }

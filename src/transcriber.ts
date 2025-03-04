@@ -64,8 +64,8 @@ abstract class Transcriber {
     callbacks: TranscriberCallbacks;
 
     public constructor(
-        callbacks: Partial<TranscriberCallbacks> = {},
-        modelURL: string
+        modelURL: string,
+        callbacks: Partial<TranscriberCallbacks> = {}
     ) {
         this.callbacks = { ...defaultTranscriberCallbacks, ...callbacks };
         Transcriber.model = new MoonshineModel(modelURL);

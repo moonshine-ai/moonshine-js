@@ -136,6 +136,7 @@ export default class MoonshineElementManager {
                 MoonshineElementManager.initLifecycleIcons(controlElement);
                 targetElements.forEach((targetElement) => {
                     var transcriber = new MicrophoneTranscriber(
+                        this.modelURL,
                         {
                             onModelLoadStarted() {
                                 // disable other s2t buttons
@@ -186,8 +187,7 @@ export default class MoonshineElementManager {
                                 targetElement.innerHTML = text;
                                 targetElement.value = text;
                             },
-                        },
-                        this.modelURL
+                        }
                     );
                     controlElement.addEventListener("click", () => {
                         if (!controlElement.attributes["disabled"]) {

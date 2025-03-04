@@ -1,11 +1,13 @@
 import MoonshineModel from "./model";
 import { Transcriber, TranscriberCallbacks } from "./transcriber";
 import { MoonshineSettings } from "./constants";
+import { AudioNodeVAD } from "@ricky0123/vad-web";
 
 class StreamTranscriber extends Transcriber {
     private mediaRecorder: MediaRecorder | undefined = undefined;
     private audioContext: AudioContext | undefined = undefined;
     private audioBuffer: AudioBuffer | undefined = undefined;
+    private voiceActivityDetector: AudioNodeVAD | undefined = undefined;
 
     /**
      * Creates a transcriber for transcribing a MediaStream from any source. After creating the {@link StreamTranscriber}, you must invoke
@@ -55,13 +57,42 @@ class StreamTranscriber extends Transcriber {
      * ```
      */
     public constructor(
+        modelURL: string,
         callbacks: Partial<TranscriberCallbacks> = {},
-        modelURL: string
+        useVAD: boolean = false
     ) {
-        super(callbacks, modelURL);
-        this.audioContext = new AudioContext({
-            sampleRate: 16000,
-        });
+        super(modelURL, callbacks);
+        // this.audioContext = new AudioContext({
+        //     sampleRate: 16000,
+        // });
+        this.audioContext = new AudioContext();
+        if (useVAD) {
+            AudioNodeVAD.new(this.audioContext, {
+                onFrameProcessed: (probabilities, frame) => {
+                    // console.log(
+                    //     "StreamTranscriber.onFrameProcessed(" +
+                    //         probabilities +
+                    //         "," +
+                    //         frame +
+                    //         ")"
+                    // );
+                },
+                onVADMisfire: () => {
+                    console.log("StreamTranscriber.onVADMisfire()");
+                },
+                onSpeechStart: () => {
+                    console.log("StreamTranscriber.onSpeechStart()");
+                },
+                onSpeechEnd: (floatArray) => {
+                    console.log("StreamTranscriber.onSpeechEnd()");
+                    this.processFrames(floatArray).then((text) => {
+                        this.callbacks.onTranscriptionUpdated(text)
+                    })
+                },
+            }).then((vad) => {
+                this.voiceActivityDetector = vad;
+            });
+        }
     }
 
     /**
@@ -72,6 +103,12 @@ class StreamTranscriber extends Transcriber {
      */
     public attachStream(stream: MediaStream) {
         this.mediaRecorder = new MediaRecorder(stream);
+        if (this.voiceActivityDetector) {
+            var sourceNode = new MediaStreamAudioSourceNode(this.audioContext, {
+                mediaStream: stream,
+            });
+            this.voiceActivityDetector.receive(sourceNode);
+        }
     }
 
     public detachStream() {
@@ -80,6 +117,10 @@ class StreamTranscriber extends Transcriber {
             this.mediaRecorder.stream.getTracks().forEach((t) => t.stop());
             this.mediaRecorder = undefined;
         }
+    }
+
+    private async processFrames(floatArray: Float32Array) {
+        return await Transcriber.model?.generate(floatArray);
     }
 
     /**
@@ -105,43 +146,49 @@ class StreamTranscriber extends Transcriber {
                 await super.loadModel();
             }
 
-            let audioChunks: Blob[] = []; // buffer of audio blobs from the user mic
-            let commitChunk: boolean = false; // flag to indicate whether the next generation should be committed (and buffer cleared)
-            let transcript: string = ""; // running transcript collected from subsequent buffers
+            // use the vad to trigger frame processing, if it exists
+            if (this.voiceActivityDetector) {
+                this.voiceActivityDetector.start();
+            }
+            // otherwise process the streaming frames
+            else {
+                let audioChunks: Blob[] = []; // buffer of audio blobs from the user mic
+                let commitChunk: boolean = false; // flag to indicate whether the next generation should be committed (and buffer cleared)
+                let transcript: string = ""; // running transcript collected from subsequent buffers
 
-            // fires every MOONSHINE_FRAME_SIZE ms
-            this.mediaRecorder.ondataavailable = (event) => {
-                let bufferSecs = Math.floor(
-                    (audioChunks.length * MoonshineSettings.FRAME_SIZE) / 1000
-                );
-                if (bufferSecs >= MoonshineSettings.MAX_SPEECH_SECS) {
-                    // the next transcript should be "committed" and we should erase the buffer afterwards
-                    commitChunk = true;
-                }
-                audioChunks.push(event.data);
+                // fires every MOONSHINE_FRAME_SIZE ms
+                this.mediaRecorder.ondataavailable = (event) => {
+                    let bufferSecs = Math.floor(
+                        (audioChunks.length * MoonshineSettings.FRAME_SIZE) /
+                            1000
+                    );
+                    if (bufferSecs >= MoonshineSettings.MAX_SPEECH_SECS) {
+                        // the next transcript should be "committed" and we should erase the buffer afterwards
+                        commitChunk = true;
+                    }
+                    audioChunks.push(event.data);
 
-                const audioBlob = new Blob(audioChunks, {
-                    type: "audio/wav",
-                });
+                    const audioBlob = new Blob(audioChunks, {
+                        type: "audio/wav",
+                    });
 
-                audioBlob.arrayBuffer().then((arrayBuffer) => {
-                    this.audioContext
-                        ?.decodeAudioData(arrayBuffer)
-                        .then((audioBuffer) => {
-                            this.audioBuffer = audioBuffer;
-                            let floatArray = new Float32Array(
-                                audioBuffer.length
-                            );
-                            if (floatArray.length > 16000 * 30) {
-                                floatArray = floatArray.subarray(0, 16000 * 30);
-                            }
-                            audioBuffer.copyFromChannel(floatArray, 0);
-                            Transcriber.model
-                                ?.generate(floatArray)
-                                .then((text) => {
-                                    this.callbacks.onTranscriptionUpdated(
-                                        text
+                    audioBlob.arrayBuffer().then((arrayBuffer) => {
+                        this.audioContext
+                            ?.decodeAudioData(arrayBuffer)
+                            .then((audioBuffer) => {
+                                this.audioBuffer = audioBuffer;
+                                let floatArray = new Float32Array(
+                                    audioBuffer.length
+                                );
+                                if (floatArray.length > 16000 * 30) {
+                                    floatArray = floatArray.subarray(
+                                        0,
+                                        16000 * 30
                                     );
+                                }
+                                audioBuffer.copyFromChannel(floatArray, 0);
+                                this.processFrames(floatArray).then((text) => {
+                                    this.callbacks.onTranscriptionUpdated(text);
                                     if (text) {
                                         if (commitChunk) {
                                             transcript =
@@ -162,11 +209,11 @@ class StreamTranscriber extends Transcriber {
                                         }
                                     }
                                 });
-                        })
-                        .catch(() => {});
-                });
-            };
-
+                            })
+                            .catch(() => {});
+                    });
+                };
+            }
             this.mediaRecorder.start(MoonshineSettings.FRAME_SIZE);
             this.callbacks.onTranscribeStarted();
 
@@ -191,6 +238,9 @@ class StreamTranscriber extends Transcriber {
         if (this.mediaRecorder) {
             this.audioBuffer = undefined;
             this.mediaRecorder.stop();
+            if (this.voiceActivityDetector) {
+                this.voiceActivityDetector.pause();
+            }
         }
     }
 }

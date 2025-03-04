@@ -51,10 +51,11 @@ class MicrophoneTranscriber extends StreamTranscriber {
      * ```
      */
     public constructor(
+        modelURL: string,
         callbacks: Partial<TranscriberCallbacks> = {},
-        modelURL: string
+        useVAD: boolean = false
     ) {
-        super(callbacks, modelURL);
+        super(modelURL, callbacks, useVAD);
     }
 
     /**
@@ -67,7 +68,12 @@ class MicrophoneTranscriber extends StreamTranscriber {
     async start() {
         // get stream from microphone input
         const stream = await navigator.mediaDevices.getUserMedia({
-            audio: true,
+            audio: {
+                channelCount: 1,
+                echoCancellation: true,
+                autoGainControl: true,
+                noiseSuppression: true,    
+            }
         });
         super.attachStream(stream);
         super.start();

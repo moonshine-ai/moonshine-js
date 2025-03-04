@@ -27,6 +27,7 @@
 
             document.addEventListener("DOMContentLoaded", () => {
                 var transcriber = new StreamTranscriber(
+                    "model/tiny",
                     {
                         onModelLoadStarted() {
                             document.getElementById("transcript").innerText = "Loading model..."
@@ -49,8 +50,7 @@
                         onTranscriptionCommitted(text) {
                             document.getElementById("transcript").innerText = text
                         },
-                    },
-                    "model/tiny"
+                    }
                 );
                 transcriber.loadModel() // preload the model (don't wait for transcription to start)
 
