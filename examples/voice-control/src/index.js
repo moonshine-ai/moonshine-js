@@ -14,8 +14,9 @@ var keywordSpotter = new KeywordSpotter({
 })
 
 var transcriber = new MicrophoneTranscriber(
-    // keywordSpotter,
     "model/tiny",
+    keywordSpotter,
+    true
 );
 
 document.getElementById("startButton").addEventListener("click", () => {

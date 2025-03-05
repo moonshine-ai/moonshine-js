@@ -62,11 +62,8 @@ class StreamTranscriber extends Transcriber {
         useVAD: boolean = false
     ) {
         super(modelURL, callbacks);
-        // this.audioContext = new AudioContext({
-        //     sampleRate: 16000,
-        // });
-        this.audioContext = new AudioContext();
         if (useVAD) {
+            this.audioContext = new AudioContext();
             AudioNodeVAD.new(this.audioContext, {
                 onFrameProcessed: (probabilities, frame) => {
                     // console.log(
@@ -82,15 +79,22 @@ class StreamTranscriber extends Transcriber {
                 },
                 onSpeechStart: () => {
                     console.log("StreamTranscriber.onSpeechStart()");
+                    this.callbacks.onTranscribeStarted()
                 },
                 onSpeechEnd: (floatArray) => {
                     console.log("StreamTranscriber.onSpeechEnd()");
-                    this.processFrames(floatArray).then((text) => {
+                    this.callbacks.onTranscribeStopped()
+                    Transcriber.model?.generate(floatArray).then((text) => {
                         this.callbacks.onTranscriptionUpdated(text)
                     })
                 },
             }).then((vad) => {
                 this.voiceActivityDetector = vad;
+            });
+        }
+        else {
+            this.audioContext = new AudioContext({
+                sampleRate: 16000,
             });
         }
     }
@@ -117,10 +121,6 @@ class StreamTranscriber extends Transcriber {
             this.mediaRecorder.stream.getTracks().forEach((t) => t.stop());
             this.mediaRecorder = undefined;
         }
-    }
-
-    private async processFrames(floatArray: Float32Array) {
-        return await Transcriber.model?.generate(floatArray);
     }
 
     /**
@@ -187,7 +187,7 @@ class StreamTranscriber extends Transcriber {
                                     );
                                 }
                                 audioBuffer.copyFromChannel(floatArray, 0);
-                                this.processFrames(floatArray).then((text) => {
+                                Transcriber.model?.generate(floatArray).then((text) => {
                                     this.callbacks.onTranscriptionUpdated(text);
                                     if (text) {
                                         if (commitChunk) {

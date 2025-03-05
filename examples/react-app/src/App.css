@@ -1,0 +1,21 @@
+#logo {
+  width: 196px;
+}
+#transcription {
+  color: #447ff7;
+}
+.st0 {
+  fill: #ffffff;
+  stroke: #3a4966;
+  stroke-width: 20;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-miterlimit: 10;
+}
+.st1 {
+  fill: none;
+  stroke: #447ff7;
+  stroke-width: 30;
+  stroke-linecap: round;
+  stroke-miterlimit: 10;
+}
