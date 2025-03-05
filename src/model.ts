@@ -88,6 +88,9 @@ export default class MoonshineModel {
     /**
      * Tests the inference latency of the current environment. This is useful for determining the appropriate
      * {@link MoonshineSettings.FRAME_SIZE} and {@link MoonshineSettings.MAX_SPEECH_SECS} for a given execution environment.
+     * 
+     * @remarks Warning: since this uses noise to benchmark the model, the model will have lower performance if you to use it 
+     * for transcription immediately after benchmarking.
      *
      * @param sampleSize (Optional) The number of samples to use for computing the benchmark
      *

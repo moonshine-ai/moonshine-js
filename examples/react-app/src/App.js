@@ -5,8 +5,9 @@ import { MicrophoneTranscriber, MoonshineSettings } from "@usefulsensors/moonshi
 // import { MicrophoneTranscriber, MoonshineSettings } from "https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.min.js"
 // Set the asset path to the CDN root (so the models are fetched from there)
 MoonshineSettings.BASE_ASSET_PATH = "https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/";
-MoonshineSettings.MAX_SPEECH_SECS = 2
-MoonshineSettings.FRAME_SIZE = 100
+MoonshineSettings.MAX_SPEECH_SECS = 5
+MoonshineSettings.MAX_RECORD_MS = undefined
+MoonshineSettings.FRAME_SIZE = 200
 
 function App() {
   const models = [
@@ -22,7 +23,12 @@ function App() {
   const transcriber = useRef(undefined);
 
   function toggle() {
-    if (transcriber.current === undefined) {
+    if (isRunning) {
+      console.log("stopping")
+      setInfoText("")
+      transcriber.current.stop()
+    }
+    else {
       console.log("model: " + model)
       console.log("streaming: " + streaming)
       transcriber.current = new MicrophoneTranscriber(
@@ -32,7 +38,7 @@ function App() {
             setInfoText("Model loading...")
           },
           onModelLoaded: () => {
-            setInfoText("Speak to begin.")
+            setInfoText("Say something...")
           },
           onTranscribeStarted: () => {
             setInfoText("Transcribing...")
@@ -41,7 +47,9 @@ function App() {
             setInfoText("")
           },
           onTranscriptionUpdated: (text) => {
-            setNewText(text)
+            if (text) {
+              setNewText(text)
+            }
           },
           onTranscriptionCommitted: (text) => {
             setPastText(text + " ")
@@ -49,12 +57,7 @@ function App() {
         },
         !streaming
       )
-    }
-
-    if (isRunning) {
-      transcriber.current.stop()
-    }
-    else {
+      console.log("starting")
       transcriber.current.start()
     }
     var running = isRunning
@@ -79,12 +82,12 @@ function App() {
           </svg>
         </div>
         <h1>Moonshine.js</h1>
-        <p>fast, accurate, and lightweight speech-to-text models running in your browser</p>
+        <p>fast and accurate speech-to-text models running in your browser</p>
       </div>
       <div className="row justify-content-center align-items-center">
           <div className="mb-1 col-lg-2">
             <select className="form-select" name="models" id="models" onChange={(e) => setModel(e.target.value)}
-            defaultValue={model}>
+            defaultValue={model} disabled={isRunning}>
               {
                 models.map((e, i) => {
                   return <option key={i} value={e}>{e}</option>
@@ -94,7 +97,7 @@ function App() {
           </div>
           <div className="mb-1 col-lg-2">
             <div className="form-check form-switch text-start">
-              <input className="form-check-input" type="checkbox" role="switch" id="mode" defaultChecked={streaming} onChange={e => setUseVAD((streaming) => !streaming)}/>
+              <input className="form-check-input" type="checkbox" role="switch" id="mode" defaultChecked={streaming} onChange={e => setUseVAD((streaming) => !streaming)} disabled={isRunning}/>
               <label className="form-check-label" for="mode">
                 Streaming mode
               </label>
@@ -104,16 +107,15 @@ function App() {
           <button className="btn btn-primary" id="toggle" onClick={toggle}>{isRunning ? "Stop" : "Start"}</button>
         </div>
       </div>
-      <div>
-        <div className="row justify-content-center">
-          <span className="text-success">{infoText}</span>
+      <div className="mt-4 row justify-content-center">
+        <h3 className="text-primary-emphasis">{infoText}</h3>
+      </div>
+      <div className="mt-1 row justify-content-center">
+        <div className="col-lg-6">
+          <h3 className="text-secondary">
+            {pastText} <span id="transcription">{newText}</span>
+          </h3>
         </div>
-        <span className="text-secondary">
-          {pastText}
-        </span>
-        <span id="transcription">
-          {newText}
-        </span>
       </div>
     </div>
   );

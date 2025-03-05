@@ -77,15 +77,6 @@ abstract class Transcriber {
         this.callbacks.onModelLoadStarted();
         await Transcriber.model.loadModel();
         this.callbacks.onModelLoaded();
-        let executionLatency;
-        Transcriber.model.benchmarkExecutionEnvironment().then((latency) => {
-            executionLatency = latency;
-            console.log(
-                "Transcriber.loadModel: latency in this environment is: " +
-                    executionLatency +
-                    "ms per 1s of input"
-            );
-        });
     }
 }
 
