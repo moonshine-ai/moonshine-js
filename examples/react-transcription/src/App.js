@@ -66,7 +66,7 @@ function App() {
 
   return (
     <div className="container text-center">
-      <div className="row">
+      <div className="mt-4 row">
         <div>
           <svg version="1.1" id="logo" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 800 800" >
             <path className="st0" d="M409,760C205.6,760,40,594.4,40,390.9C40,228.5,144.4,88.5,294.8,40C236.6,100.9,203,182.9,203,268.3

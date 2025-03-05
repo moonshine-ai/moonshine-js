@@ -19,3 +19,9 @@
   stroke-linecap: round;
   stroke-miterlimit: 10;
 }
+.btn-primary {
+  background-color: #447ff7 !important;
+}
+body {
+  color: #3a4966 !important;
+}
