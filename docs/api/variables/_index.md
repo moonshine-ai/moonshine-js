@@ -1,4 +1,4 @@
 ---
 title: "Variables"
 ---
-- [MoonshineSettings](/docs/api/variables/MoonshineSettings)
+- [MoonshineSettings](/docs/api/variables/moonshinesettings)

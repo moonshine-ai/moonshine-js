@@ -9,7 +9,12 @@ function processMarkdownFiles(directory) {
             return;
         }
         let indexTitle = directory.split("/")[2]
-        let indexFileContent = `---\ntitle: "${String(indexTitle[0]).toUpperCase() + String(indexTitle).slice(1)}"\n---\n`
+        let indexFileContent
+
+        if (indexTitle) {
+            indexFileContent = `---\ntitle: "${String(indexTitle[0]).toUpperCase() + String(indexTitle).slice(1)}"\n---\n`
+        }
+
         files.forEach(file => {
             const filePath = path.join(directory, file);
             
@@ -23,7 +28,7 @@ function processMarkdownFiles(directory) {
                     processMarkdownFiles(filePath); // Recurse into subdirectory
                 } else if (path.extname(file) === '.md' && file !== "README.md") {
                     removeFirstLine(filePath);
-                    let fileLink = "- [" + file.replace(".md", "") + "](/" + filePath.replace(".md", "") + ")\n"
+                    let fileLink = "- [" + file.replace(".md", "") + "](/" + filePath.replace(".md", "").toLowerCase() + ")\n"
                     indexFileContent += fileLink
                     fs.writeFile(path.join(directory, "_index.md"), indexFileContent, (err) => {
                         if (err) {
@@ -50,7 +55,12 @@ function removeFirstLine(filePath) {
             let newData;
 
             lines.slice(1).forEach((l) => {
-                newData += l.replace(".md", "") + "\n"
+                while (l.search(/([^/]+)\.md.{1}/) !== -1) {
+                    l = l.replace(/([^/]+)\.md.{1}/, (match) => {
+                        return match.toLowerCase().replace(".md", "")
+                    })
+                }
+                newData += l + "\n"
             });
 
             fs.writeFile(filePath, newData, 'utf8', err => {

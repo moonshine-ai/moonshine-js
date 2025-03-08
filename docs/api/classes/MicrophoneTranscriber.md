@@ -3,11 +3,11 @@ undefined
 
 Defined in: [microphoneTranscriber.ts:8](https://github.com/usefulsensors/moonshine-js/blob/main/src/microphoneTranscriber.ts#L8)
 
-Accesses the user's microphone and generates transcriptions using an underlying [StreamTranscriber](/docs/api/classes/StreamTranscriber).
+Accesses the user's microphone and generates transcriptions using an underlying [StreamTranscriber](/docs/api/classes/streamtranscriber).
 
 ## Extends
 
-- [`StreamTranscriber`](/docs/api/classes/StreamTranscriber)
+- [`StreamTranscriber`](/docs/api/classes/streamtranscriber)
 
 ## Constructors
 
@@ -29,12 +29,12 @@ Creates a transcriber for transcribing an audio stream from a mic.
 | Parameter | Type | Default value |
 | ------ | ------ | ------ |
 | `modelURL` | `string` | `undefined` |
-| `callbacks` | `Partial`\<[`TranscriberCallbacks`](/docs/api/interfaces/TranscriberCallbacks)\> | `{}` |
+| `callbacks` | `Partial`\<[`TranscriberCallbacks`](/docs/api/interfaces/transcribercallbacks)\> | `{}` |
 | `useVAD` | `boolean` | `false` |
 
 #### Returns
 
-[`MicrophoneTranscriber`](/docs/api/classes/MicrophoneTranscriber)
+[`MicrophoneTranscriber`](/docs/api/classes/microphonetranscriber)
 
 #### Example
 
@@ -73,14 +73,14 @@ transcriber.start();
 
 #### Overrides
 
-[`StreamTranscriber`](/docs/api/classes/StreamTranscriber).[`constructor`](/docs/api/classes/StreamTranscriber.md#constructors)
+[`StreamTranscriber`](/docs/api/classes/streamtranscriber).[`constructor`](/docs/api/classes/streamtranscriber#constructors)
 
 ## Properties
 
 | Property | Modifier | Type | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ |
-| <a id="callbacks-1"></a> `callbacks` | `public` | [`TranscriberCallbacks`](/docs/api/interfaces/TranscriberCallbacks) | [`StreamTranscriber`](/docs/api/classes/StreamTranscriber.md).[`callbacks`](/docs/api/classes/StreamTranscriber.md#callbacks-1) | [transcriber.ts:66](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L66) |
-| <a id="model"></a> `model` | `static` | [`MoonshineModel`](/docs/api/classes/MoonshineModel) | [`StreamTranscriber`](/docs/api/classes/StreamTranscriber.md).[`model`](/docs/api/classes/StreamTranscriber.md#model) | [transcriber.ts:65](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L65) |
+| <a id="callbacks-1"></a> `callbacks` | `public` | [`TranscriberCallbacks`](/docs/api/interfaces/transcribercallbacks) | [`StreamTranscriber`](/docs/api/classes/streamtranscriber).[`callbacks`](/docs/api/classes/streamtranscriber#callbacks-1) | [transcriber.ts:66](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L66) |
+| <a id="model"></a> `model` | `static` | [`MoonshineModel`](/docs/api/classes/moonshinemodel) | [`StreamTranscriber`](/docs/api/classes/streamtranscriber).[`model`](/docs/api/classes/streamtranscriber#model) | [transcriber.ts:65](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L65) |
 
 ## Methods
 
@@ -92,7 +92,7 @@ attachStream(stream): void
 
 Defined in: [streamTranscriber.ts:121](https://github.com/usefulsensors/moonshine-js/blob/main/src/streamTranscriber.ts#L121)
 
-Attaches a MediaStream to this [StreamTranscriber](/docs/api/classes/StreamTranscriber) for transcription. A MediaStream must be attached before
+Attaches a MediaStream to this [StreamTranscriber](/docs/api/classes/streamtranscriber) for transcription. A MediaStream must be attached before
 starting transcription.
 
 #### Parameters
@@ -107,7 +107,7 @@ starting transcription.
 
 #### Inherited from
 
-[`StreamTranscriber`](/docs/api/classes/StreamTranscriber).[`attachStream`](/docs/api/classes/StreamTranscriber.md#attachstream)
+[`StreamTranscriber`](/docs/api/classes/streamtranscriber).[`attachStream`](/docs/api/classes/streamtranscriber#attachstream)
 
 ***
 
@@ -127,7 +127,7 @@ Detaches the MediaStream used for transcription.
 
 #### Inherited from
 
-[`StreamTranscriber`](/docs/api/classes/StreamTranscriber).[`detachStream`](/docs/api/classes/StreamTranscriber.md#detachstream)
+[`StreamTranscriber`](/docs/api/classes/streamtranscriber).[`detachStream`](/docs/api/classes/streamtranscriber#detachstream)
 
 ***
 
@@ -150,7 +150,7 @@ An AudioBuffer
 
 #### Inherited from
 
-[`StreamTranscriber`](/docs/api/classes/StreamTranscriber).[`getAudioBuffer`](/docs/api/classes/StreamTranscriber.md#getaudiobuffer)
+[`StreamTranscriber`](/docs/api/classes/streamtranscriber).[`getAudioBuffer`](/docs/api/classes/streamtranscriber#getaudiobuffer)
 
 ***
 
@@ -168,7 +168,7 @@ Defined in: [transcriber.ts:78](https://github.com/usefulsensors/moonshine-js/bl
 
 #### Inherited from
 
-[`StreamTranscriber`](/docs/api/classes/StreamTranscriber).[`loadModel`](/docs/api/classes/StreamTranscriber.md#loadmodel)
+[`StreamTranscriber`](/docs/api/classes/streamtranscriber).[`loadModel`](/docs/api/classes/streamtranscriber#loadmodel)
 
 ***
 
@@ -186,9 +186,9 @@ This will request microphone permissions (if not already provided), load the mod
 one of the following:
 
 if `useVAD === true`: generate an updated transcription at the end of every chunk of detected voice activity.
-else if `useVAD === false`: generate an updated transcription every [MoonshineSettings.FRAME\_SIZE](/docs/api/variables/MoonshineSettings#frame_size) milliseconds. 
+else if `useVAD === false`: generate an updated transcription every [MoonshineSettings.FRAME\_SIZE](/docs/api/variables/moonshinesettings#frame_size) milliseconds. 
 
-Transcription will stop when [stop](/docs/api/classes/MicrophoneTranscriber#stop) is called, or when [MoonshineSettings.MAX\_RECORD\_MS](/docs/api/variables/MoonshineSettings.md#max_record_ms) is passed (whichever comes first).
+Transcription will stop when [stop](/docs/api/classes/microphonetranscriber#stop) is called, or when [MoonshineSettings.MAX\_RECORD\_MS](/docs/api/variables/moonshinesettings#max_record_ms) is passed (whichever comes first).
 
 #### Returns
 
@@ -196,7 +196,7 @@ Transcription will stop when [stop](/docs/api/classes/MicrophoneTranscriber#stop
 
 #### Overrides
 
-[`StreamTranscriber`](/docs/api/classes/StreamTranscriber).[`start`](/docs/api/classes/StreamTranscriber.md#start)
+[`StreamTranscriber`](/docs/api/classes/streamtranscriber).[`start`](/docs/api/classes/streamtranscriber#start)
 
 ***
 
@@ -216,5 +216,5 @@ Stops transcription.
 
 #### Inherited from
 
-[`StreamTranscriber`](/docs/api/classes/StreamTranscriber).[`stop`](/docs/api/classes/StreamTranscriber.md#stop)
+[`StreamTranscriber`](/docs/api/classes/streamtranscriber).[`stop`](/docs/api/classes/streamtranscriber#stop)
 

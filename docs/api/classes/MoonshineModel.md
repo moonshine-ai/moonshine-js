@@ -21,16 +21,16 @@ Create (but do not load) a new MoonshineModel for inference.
 
 | Parameter | Type | Default value | Description |
 | ------ | ------ | ------ | ------ |
-| `modelURL` | `string` | `undefined` | A string (relative to [MoonshineSettings.BASE\_ASSET\_PATH](/docs/api/variables/MoonshineSettings#base_asset_path)) where the `.onnx` model weights are located. |
+| `modelURL` | `string` | `undefined` | A string (relative to [MoonshineSettings.BASE\_ASSET\_PATH](/docs/api/variables/moonshinesettings#base_asset_path)) where the `.onnx` model weights are located. |
 | `precision` | `string` | `"quantized"` | - |
 
 #### Returns
 
-[`MoonshineModel`](/docs/api/classes/MoonshineModel)
+[`MoonshineModel`](/docs/api/classes/moonshinemodel)
 
 #### Remarks
 
-Creating a MoonshineModel has the side effect of setting the path to the `onnxruntime-web` `.wasm` to the [MoonshineSettings.BASE\_ASSET\_PATH](/docs/api/variables/MoonshineSettings#base_asset_path)
+Creating a MoonshineModel has the side effect of setting the path to the `onnxruntime-web` `.wasm` to the [MoonshineSettings.BASE\_ASSET\_PATH](/docs/api/variables/moonshinesettings#base_asset_path)
 
 ## Methods
 
@@ -43,7 +43,7 @@ benchmarkExecutionEnvironment(sampleSize): Promise<number>
 Defined in: [model.ts:99](https://github.com/usefulsensors/moonshine-js/blob/main/src/model.ts#L99)
 
 Tests the inference latency of the current environment. This is useful for determining the appropriate
-[MoonshineSettings.FRAME\_SIZE](/docs/api/variables/MoonshineSettings#frame_size) and [MoonshineSettings.MAX\_SPEECH\_SECS](/docs/api/variables/MoonshineSettings.md#max_speech_secs) for a given execution environment.
+[MoonshineSettings.FRAME\_SIZE](/docs/api/variables/moonshinesettings#frame_size) and [MoonshineSettings.MAX\_SPEECH\_SECS](/docs/api/variables/moonshinesettings#max_speech_secs) for a given execution environment.
 
 #### Parameters
 
@@ -96,7 +96,7 @@ getLatency(): number
 
 Defined in: [model.ts:119](https://github.com/usefulsensors/moonshine-js/blob/main/src/model.ts#L119)
 
-Returns the latency (in ms) of the most recent call to [MoonshineModel.generate](/docs/api/classes/MoonshineModel#generate)
+Returns the latency (in ms) of the most recent call to [MoonshineModel.generate](/docs/api/classes/moonshinemodel#generate)
 
 #### Returns
 

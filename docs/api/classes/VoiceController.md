@@ -7,12 +7,12 @@ An interface for invoking voice-controlled actions on a page using speech transc
 
 ## Extended by
 
-- [`KeywordSpotter`](/docs/api/classes/KeywordSpotter)
-- [`IntentClassifier`](/docs/api/classes/IntentClassifier)
+- [`KeywordSpotter`](/docs/api/classes/keywordspotter)
+- [`IntentClassifier`](/docs/api/classes/intentclassifier)
 
 ## Implements
 
-- [`TranscriberCallbacks`](/docs/api/interfaces/TranscriberCallbacks)
+- [`TranscriberCallbacks`](/docs/api/interfaces/transcribercallbacks)
 
 ## Constructors
 
@@ -29,11 +29,11 @@ Defined in: [voiceController.ts:21](https://github.com/usefulsensors/moonshine-j
 | Parameter | Type |
 | ------ | ------ |
 | `commandHandlers` | `CommandHandlers` |
-| `callbacks` | `Partial`\<[`TranscriberCallbacks`](/docs/api/interfaces/TranscriberCallbacks)\> |
+| `callbacks` | `Partial`\<[`TranscriberCallbacks`](/docs/api/interfaces/transcribercallbacks)\> |
 
 #### Returns
 
-[`VoiceController`](/docs/api/classes/VoiceController)
+[`VoiceController`](/docs/api/classes/voicecontroller)
 
 ## Properties
 
