@@ -72,4 +72,4 @@ transcriber.start();
 
 Now the transcription will only update between pauses in speech. 
 
-That's all it takes to get started! Read [the guides](moonshinejs.com/docs/guide/) to learn how to transcribe audio from other sources, or to build voice-controlled applications.
+That's all it takes to get started! Read [the guides](https://moonshinejs.com/docs/guide/) to learn how to transcribe audio from other sources, or to build voice-controlled applications.
