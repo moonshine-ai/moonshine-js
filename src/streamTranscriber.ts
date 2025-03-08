@@ -3,6 +3,11 @@ import { Transcriber, TranscriberCallbacks } from "./transcriber";
 import { MoonshineSettings } from "./constants";
 import { AudioNodeVAD } from "@ricky0123/vad-web";
 
+/**
+ * Implements real-time transcription of an audio stream sourced from a WebAudio-compliant MediaStream object.
+ * 
+ * Read more about working with MediaStreams: {@link https://developer.mozilla.org/en-US/docs/Web/API/MediaStream}
+ */
 class StreamTranscriber extends Transcriber {
     private mediaRecorder: MediaRecorder | undefined = undefined;
     private audioContext: AudioContext | undefined = undefined;
@@ -14,10 +19,15 @@ class StreamTranscriber extends Transcriber {
      * Creates a transcriber for transcribing a MediaStream from any source. After creating the {@link StreamTranscriber}, you must invoke
      * {@link StreamTranscriber.attachStream} to provide a MediaStream that you want to transcribe.
      *
-     * @param callbacks A set of optional {@link TranscriberCallbacks} used to trigger behavior at different steps of the
-     * transcription lifecycle.
      * @param modelURL The URL that the underlying {@link MoonshineModel} weights should be loaded from,
-     * relative to {@link MoonshineSettings.BASE_ASSET_PATH}
+     * relative to {@link MoonshineSettings.BASE_ASSET_PATH}.
+     * 
+     * @param callbacks A set of {@link TranscriberCallbacks} used to trigger behavior at different steps of the
+     * transcription lifecycle. For transcription-only use cases, you should define the {@link TranscriberCallbacks} yourself;
+     * when using the transcriber for voice control, you should create a {@link VoiceController} and pass it in.
+     * 
+     * @param useVAD A boolean specifying whether or not to use Voice Activity Detection (VAD) on audio processed by the transcriber.
+     * When set to `true`, the transcriber will only process speech at the end of each chunk of voice activity.
      *
      * @example
      * This basic example demonstrates the use of the transcriber with custom callbacks:
@@ -26,6 +36,7 @@ class StreamTranscriber extends Transcriber {
      * import StreamTranscriber from "@usefulsensors/moonshine-js";
      *
      * var transcriber = new StreamTranscriber(
+     *      "model/tiny",
      *      {
      *          onModelLoadStarted() {
      *              console.log("onModelLoadStarted()");
@@ -46,8 +57,7 @@ class StreamTranscriber extends Transcriber {
      *                  "onTranscriptionCommitted(" + text + ")"
      *              );
      *          },
-     *      },
-     *      "model/tiny"
+     *      }
      * );
      *
      * // Get a MediaStream from somewhere (user mic, active tab, an <audio> element, WebRTC source, etc.)
@@ -118,6 +128,9 @@ class StreamTranscriber extends Transcriber {
         }
     }
 
+    /**
+     * Detaches the MediaStream used for transcription.
+     */
     public detachStream() {
         if (this.mediaRecorder) {
             this.stop();
@@ -138,7 +151,12 @@ class StreamTranscriber extends Transcriber {
 
     /**
      * Starts transcription.
-     *
+     * 
+     * if `useVAD === true`: generate an updated transcription at the end of every chunk of detected voice activity.
+     * else if `useVAD === false`: generate an updated transcription every {@link MoonshineSettings.FRAME_SIZE} milliseconds. 
+     * 
+     * Transcription will stop when {@link stop} is called, or when {@link MoonshineSettings.MAX_RECORD_MS} is passed (whichever comes first).
+     * 
      * Note that the {@link StreamTranscriber} must have a MediaStream attached via {@link StreamTranscriber.attachStream} before
      * starting transcription.
      */

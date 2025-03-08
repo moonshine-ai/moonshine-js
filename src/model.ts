@@ -9,7 +9,7 @@ function argMax(array) {
 }
 
 /**
- * Implements speech-to-text inferences with Moonshine models using `onnxruntime-web`.
+ * Implements speech-to-text inferences with Moonshine models.
  */
 export default class MoonshineModel {
     private modelURL: string;

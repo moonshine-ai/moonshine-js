@@ -1,0 +1,23 @@
+{
+    "$schema": "https://typedoc-plugin-markdown.org/schema.json",
+    "entryPoints": ["./src/index.ts"],
+    "plugin": ["typedoc-plugin-markdown"],
+    "enumMembersFormat": "table",
+    "parametersFormat": "table",
+    "propertiesFormat": "table",
+    "typeDeclarationFormat": "table",
+    "indexFormat": "table",
+    "useCodeBlocks": true,
+    "expandObjects": true,
+    "textContentMappings": {
+      "breadcrumbs.home": "Home"
+    },
+    "gitRevision": "main",
+    "hidePageHeader": true,
+    "excludeExternals": true,
+    "externalPattern": [
+        "**/node_modules/**"
+    ],
+    "skipErrorChecking": true,
+    "publicPath": "/docs/api/"
+}

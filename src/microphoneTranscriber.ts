@@ -1,20 +1,14 @@
-import MoonshineModel from "./model";
 import { MoonshineSettings } from "./constants";
 import { TranscriberCallbacks } from "./transcriber";
 import StreamTranscriber from "./streamTranscriber";
 
 /**
- * An interface for accessing the user's microphone and generating transcriptions using an underlying {@link StreamTranscriber}.
+ * Accesses the user's microphone and generates transcriptions using an underlying {@link StreamTranscriber}.
  */
 class MicrophoneTranscriber extends StreamTranscriber {
 
     /**
      * Creates a transcriber for transcribing an audio stream from a mic.
-     *
-     * @param callbacks A set of optional {@link TranscriberCallbacks} used to trigger behavior at different steps of the
-     * transcription lifecycle.
-     * @param modelURL The URL that the underlying {@link MoonshineModel} weights should be loaded from,
-     * relative to {@link MoonshineSettings.BASE_ASSET_PATH}
      *
      * @example
      * This basic example demonstrates the use of the transcriber with custom callbacks:
@@ -23,6 +17,7 @@ class MicrophoneTranscriber extends StreamTranscriber {
      * import MicrophoneTranscriber from "@usefulsensors/moonshine-js";
      *
      * var transcriber = new MicrophoneTranscriber(
+     *      "model/tiny"
      *      {
      *          onModelLoadStarted() {
      *              console.log("onModelLoadStarted()");
@@ -44,7 +39,6 @@ class MicrophoneTranscriber extends StreamTranscriber {
      *              );
      *          },
      *      },
-     *      "model/tiny"
      * );
      *
      * transcriber.start();
@@ -61,9 +55,13 @@ class MicrophoneTranscriber extends StreamTranscriber {
     /**
      * Starts transcription.
      *
-     * This will request microphone permissions (if not already provided), load the model (if not already loaded), and
-     * generate an updated transcription every {@link MoonshineSettings.FRAME_SIZE} milliseconds. Transcription will stop
-     * when {@link stop} is called, or when {@link MoonshineSettings.MAX_RECORD_MS} is passed (whichever comes first).
+     * This will request microphone permissions (if not already provided), load the model (if not already loaded), and do
+     * one of the following:
+     * 
+     * if `useVAD === true`: generate an updated transcription at the end of every chunk of detected voice activity.
+     * else if `useVAD === false`: generate an updated transcription every {@link MoonshineSettings.FRAME_SIZE} milliseconds. 
+     * 
+     * Transcription will stop when {@link stop} is called, or when {@link MoonshineSettings.MAX_RECORD_MS} is passed (whichever comes first).
      */
     async start() {
         // get stream from microphone input

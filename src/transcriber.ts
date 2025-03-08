@@ -1,9 +1,8 @@
 import MoonshineModel from "./model";
 
 /**
- * {@link TranscriberCallbacks} are invoked at different phases of the lifecycle as audio is transcribed.
- * By defining custom callbacks, you can control the behavior of the application in response to model loading,
- * starting of transcription, stopping of transcription, and updates to the transcription of the audio stream.
+ * Callbacks that are invoked at different phases of the lifecycle as audio is transcribed. You can control the behavior of the application 
+ * in response to model loading, starting of transcription, stopping of transcription, and updates to the transcription of the audio stream.
  *
  * @property onModelLoadStarted() - called when the {@link MoonshineModel} begins to load (or download, if hosted elsewhere)
  *
@@ -59,6 +58,9 @@ const defaultTranscriberCallbacks: TranscriberCallbacks = {
     },
 };
 
+/**
+ * An abstract transcriber for speech-to-text processing.
+ */
 abstract class Transcriber {
     static model: MoonshineModel;
     callbacks: TranscriberCallbacks;

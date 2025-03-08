@@ -1,145 +1,75 @@
-# @usefulsensors/moonshine-js
+# Moonshine.js
 
-This package provides quick and easy integration of client-side, on-device speech-to-text on web pages and in web applications with Useful Sensors' [Moonshine](https://github.com/usefulsensors/moonshine) models. It includes the following:
+Moonshine.js makes it easy for web developers to build modern, speech-driven web experiences without sacrificing user privacy. We build on three key principles:
 
--   🌙 **Rapid UI integration**: add a single `<script>` that automatically adds speech-to-text to all text inputs on a page, or design your own UI integration in a few easy steps.
--   🌙 **Simple client-side speech-to-text primitives**: just import [a single class](https://usefulsensors.github.io/moonshine-js/classes/MicrophoneTranscriber.html) to transcribe microphone input, or use our [lower-level implementation](https://usefulsensors.github.io/moonshine-js/classes/StreamTranscriber.html) to easily transcribe audio from other sources (e.g., `<audio>` elements, sounds playing in a browser tab, WebRTC connections, etc.).
+- **Fast Transcription**: simply connect a WebAudio-compliant media stream from any browser audio source and generate rapid transcriptions of speech.
+- **Easy Voice Control**: build feature-rich voice-controlled web apps in < 10 lines of code.
+- **Local Processing**: all audio processing happens locally in the user's web browser---no cloud services or privacy violations required.
 
 _Note: This package is currently in beta, and breaking changes may occur between versions. User feedback and developer contributions are welcome._
 
-## Intro
-
-We provide three options for building your application: _auto_, _manual_, and _core_. The "auto" and "manual" options are for users who want to quickly add speech-to-text input to HTML elements on their pages with minimal JavaScript programming. The "core" option is for users who want more in-depth control. It allows you to transcribe audio from any source.
-
-There are a few key modules provided by the `moonshine-js` core library:
-
--   `StreamTranscriber`: provides transcription of a [MediaStream](https://developer.mozilla.org/en-US/docs/Web/API/MediaStream), allowing you to transcribe audio from many sources.
--   `MicrophoneTranscriber`: provides transcription of user microphone input.
--   `MoonshineModel`: lower-level implementation of transcription generation from input audio (as a [Float32Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Float32Array)) using our ONNX models.
-
-[Read the docs](https://usefulsensors.github.io/moonshine-js/) for more information.
-
 ## Installation
 
-You can include `moonshine-js` via CDN, or install it with `npm`.
+You can use Moonshine.js via CDN, or you can install it with `npm`. Simply import the package depending on your preferred method.
 
-### Option 1. Include via CDN
+### Via CDN
 
-#### Auto: Automatically add a speech-to-text button to all input fields.
-
-Include the following `<script>` tag:
-
-```html
-<script
-    type="module"
-    src="https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.auto.min.js"
-></script>
+```javascript
+import * as Moonshine from 'https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.min.js'
 ```
 
-#### Manual: Customize speech-to-text inputs with your own HTML.
+### Via `npm`
 
-Include the following `<script>` tag:
+Install the package first:
 
-```html
-<script
-    type="module"
-    src="https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.manual.min.js"
-></script>
-```
-
-Now you can specify which text inputs should be speech-enabled and customize their appearance. Add a `data-moonshine-target` attribute to any clickable element that you want to trigger speech-to-text, and set its value to a CSS selector of the element(s) that should be updated with the transcription output. For example:
-
-```html
-<textarea id="myTextArea"></textarea>
-<button data-moonshine-target="#myTextArea"></button>
-```
-
-The manual option also provides options for customizing your layout; [see some examples here](https://github.com/usefulsensors/moonshine-js/blob/main/examples/quickstart/manual.html).
-
-#### Core: Build your own speech-to-text application.
-
-You can also import modules directly from the CDN-hosted core library:
-
-```html
-<!DOCTYPE html>
-    <head>
-        ...
-    </head>
-    <body>
-        ...
-        <script type="module">
-            import { StreamTranscriber, MoonshineSettings } from "https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.min.js"
-            // Set the asset path to the CDN root (so the models are fetched from there)
-            MoonshineSettings.BASE_ASSET_PATH = "https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/";
-
-            var transcriber = new StreamTranscriber(
-                {
-                    onModelLoadStarted() {
-                        console.log("onModelLoadStarted()");
-                    },
-                    onModelLoaded() {
-                        console.log("onModelLoaded()");
-                    },
-                    onTranscribeStarted() {
-                        console.log("onTranscribeStarted()");
-                    },
-                    onTranscribeStopped() {
-                        console.log("onTranscribeStopped()");
-                    },
-                    onTranscriptionUpdated(text) {
-                        console.log(
-                            "onTranscriptionUpdated(" + text + ")"
-                        );
-                    },
-                    onTranscriptionCommitted(text) {
-                        console.log("onTranscriptionCommitted()");
-                    },
-                },
-                "model/tiny"
-            );
-            // Get a MediaStream from some source...
-            ...
-
-            // Attach the stream to the transcriber and start transcription
-            transcriber.attachStream(mediaStream);
-            transcriber.start();
-        </script>
-    </body>
-</html>
-```
-
-See a quickstart example [here](https://github.com/usefulsensors/moonshine-js/blob/main/examples/quickstart/core.html).
-
-### Option 2. Install with `npm`
-
-Just run:
-
-```
+```shell
 npm install @usefulsensors/moonshine-js
 ```
 
-You will need to copy over the `.onnx` model weights and the `.wasm` for the ONNX runtime. By default, `moonshine-js` expects these files to be in a `/dist` folder within your project directory, organized as follows:
+Then import:
 
-```
-myApp/
-├─ dist/
-│  ├─ model/
-│  │  ├─ base/
-│  │  │  ├─ float/
-│  │  │  │  ├─ *.onnx
-│  │  ├─ tiny/
-│  │  │  ├─ float/
-│  │  │  │  ├─ *.onnx
-│  ├─ ort-wasm-simd-threaded.jsep.mjs
-│  ├─ ort-wasm-simd-threaded.jsep.wasm
-├─ node_modules/
-├─ package.json
-├─ ...
+```javascript
+import * as Moonshine from '@usefulsensors/moonshine-js'
 ```
 
-Run the following in a bash/zsh terminal in the top level of your project directory to copy everything over:
+## Quickstart
 
-``` shell
-mkdir -p dist
-rsync -av --exclude="*.js" node_modules/@usefulsensors/moonshine-js/dist/ dist
+Let's get started with a simple example. We'll create a transcriber to print speech from the microphone to the console. 
+We can use the MicrophoneTranscriber for that. You can control the behavior of the transcriber by passing it a set of 
+callbacks when you create it:
+
+```javascript
+import * as Moonshine from 'https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.min.js'
+
+var transcriber = new Moonshine.MicrophoneTranscriber(
+    "model/tiny", // the fastest and smallest Moonshine model
+    {
+        onTranscriptionUpdated(text) {
+            console.log(text)
+        }
+    }
+)
+
+transcriber.start();
 ```
+
+When we start the transcriber, the browser will request mic permissions and begin printing everything the user says to the console. It is useful in some cases to wait 
+until the user has stopped speaking to transcribe their words. In this case, we'll enable voice activity detection (VAD) when we create the transcriber:
+
+```javascript {hl_lines=[8],linenostart=1}
+var transcriber = new Moonshine.MicrophoneTranscriber(
+    "model/tiny",
+    {
+        onTranscriptionUpdated(text) {
+            console.log(text)
+        }
+    },
+    true // enable voice activity detection
+)
+
+transcriber.start();
+```
+
+Now the transcription will only update between pauses in speech. 
+
+That's all it takes to get started! Read [the guides](moonshinejs.com/docs/guide/) to learn how to transcribe audio from other sources, or to build voice-controlled applications.

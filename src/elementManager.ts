@@ -1,5 +1,4 @@
 import MicrophoneTranscriber from "./microphoneTranscriber";
-import { MoonshineLifecycle } from "./constants";
 import styles from "./css/base.css";
 import IdleIcon from "./svg/idle.svg";
 import LoadingIcon from "./svg/loading.svg";
@@ -14,6 +13,12 @@ function getRandomID() {
         result += characters[randomIndex];
     }
     return result;
+}
+
+enum MoonshineLifecycle {
+    idle = "idle",
+    loading = "loading",
+    transcribing = "transcribing"
 }
 
 /**

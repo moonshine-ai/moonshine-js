@@ -12,8 +12,8 @@ const plugins = [
       stringify: true
     }),
     css(),
-    commonjs()
-    // terser(),
+    commonjs(),
+    terser()
 ];
 
 export default [
@@ -26,24 +26,24 @@ export default [
         },
         plugins: plugins,
     },
-    // manual moonshine-ify from CDN
-    {
-        input: "src/manual.ts",
-        output: {
-            file: "dist/moonshine.manual.min.js",
-            format: "iife",
-            name: "UsefulMoonshine",
-        },
-        plugins: plugins,
-    },
+    // // manual moonshine-ify from CDN
+    // {
+    //     input: "src/manual.ts",
+    //     output: {
+    //         file: "dist/moonshine.manual.min.js",
+    //         format: "iife",
+    //         name: "UsefulMoonshine",
+    //     },
+    //     plugins: plugins,
+    // },
     // auto moonshine-ify from CDN
-    {
-        input: "src/auto.ts",
-        output: {
-            file: "dist/moonshine.auto.min.js",
-            format: "iife",
-            name: "UsefulMoonshine",
-        },
-        plugins: plugins,
-    },
+    // {
+    //     input: "src/auto.ts",
+    //     output: {
+    //         file: "dist/moonshine.auto.min.js",
+    //         format: "iife",
+    //         name: "UsefulMoonshine",
+    //     },
+    //     plugins: plugins,
+    // },
 ];

@@ -1,16 +1,17 @@
 {
   "name": "@usefulsensors/moonshine-js",
   "version": "0.1.7",
-  "description": "On-device speech-to-text for web applications with Moonshine.",
+  "description": "On-device speech-to-text and voice control for web applications with Moonshine.",
   "type": "module",
   "scripts": {
-    "build": "npx rollup --config && npm run docs",
+    "build": "npm run docs && npx rollup --config",
     "dev": "npm run build && npx vite",
-    "docs": "npx typedoc src/index.ts"
+    "docs": "npx typedoc src/index.ts --plugin typedoc-plugin-markdown --out ./docs/api && node docs/postdocs.mjs && mv ./docs/api/globals.md ./docs/api/_index.md && rm ./docs/api/README.md"
   },
   "author": "Useful Sensors",
   "license": "MIT",
   "dependencies": {
+    "@huggingface/transformers": "^3.3.3",
     "@ricky0123/vad-web": "^0.0.22",
     "llama-tokenizer-js": "^1.2.2",
     "onnxruntime-web": "^1.21.0-dev.20250129-80bc1d25f0"
@@ -25,7 +26,8 @@
     "rollup-plugin-import-css": "^3.5.8",
     "rollup-plugin-svg-import": "^3.0.0",
     "tslib": "^2.8.1",
-    "typedoc": "^0.27.5",
+    "typedoc": "^0.27.9",
+    "typedoc-plugin-markdown": "^4.4.2",
     "typescript": "^5.7.2",
     "vite": "^6.0.3"
   },
@@ -45,6 +47,7 @@
   "keywords": [
     "asr",
     "speech-to-text",
+    "voice-control",
     "on-device",
     "tinyml",
     "speech",
