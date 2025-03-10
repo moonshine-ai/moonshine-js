@@ -1,7 +1,8 @@
 import MoonshineModel from "./model";
+import Log from "./log";
 
 /**
- * Callbacks that are invoked at different phases of the lifecycle as audio is transcribed. You can control the behavior of the application 
+ * Callbacks are invoked at different phases of the lifecycle as audio is transcribed. You can control the behavior of the application
  * in response to model loading, starting of transcription, stopping of transcription, and updates to the transcription of the audio stream.
  *
  * @property onModelLoadStarted() - called when the {@link MoonshineModel} begins to load (or download, if hosted elsewhere)
@@ -12,14 +13,18 @@ import MoonshineModel from "./model";
  *
  * @property onTranscribeStopped() - called once when transcription stops
  *
- * @property onTranscriptionUpdated(text) - called every {@link MoonshineSettings.FRAME_SIZE} milliseconds while
+ * @property onTranscriptionUpdated(text) - called every {@link Settings.FRAME_SIZE} milliseconds while
  * transcription is active. Use this callback when you don't need long-running transcription - you only care about
  * the most-recent transcription output. Note that the transcription output may be empty in cases where no speech was detected.
  *
- * @property onTranscriptionCommitted(text) - called every {@link MoonshineSettings.FRAME_SIZE} milliseconds while
- * transcription is active, and every {@link MoonshineSettings.MAX_SPEECH_SECS} when the transcription is "committed",
+ * @property onTranscriptionCommitted(text) - called every {@link Settings.FRAME_SIZE} milliseconds while
+ * transcription is active, and every {@link Settings.MAX_SPEECH_SECS} when the transcription is "committed",
  * i.e., the underlying audio buffer is emptied and the model begins inferences on a fresh buffer. Use this callback
  * for a long-running transcription of audio.
+ * 
+ * @property onSpeechStart() - called when the VAD model detects the start of speech if `useVAD === true`.
+ * 
+ * @property onSpeechEnd() - called when the VAD model detects the end of speech if `useVAD === true`.
  *
  * @interface
  */
@@ -35,26 +40,36 @@ interface TranscriberCallbacks {
     onTranscriptionUpdated: (text: string | undefined) => any;
 
     onTranscriptionCommitted: (text: string | undefined) => any;
+
+    onSpeechStart: () => any;
+
+    onSpeechEnd: () => any;
 }
 
 const defaultTranscriberCallbacks: TranscriberCallbacks = {
     onModelLoadStarted: function () {
-        console.log("Transcriber.onModelLoadStarted()");
+        Log.log("Transcriber.onModelLoadStarted()");
     },
     onModelLoaded: function () {
-        console.log("Transcriber.onModelLoaded()");
+        Log.log("Transcriber.onModelLoaded()");
     },
     onTranscribeStarted: function () {
-        console.log("Transcriber.onTranscribeStarted()");
+        Log.log("Transcriber.onTranscribeStarted()");
     },
     onTranscribeStopped: function () {
-        console.log("Transcriber.onTranscribeStopped()");
+        Log.log("Transcriber.onTranscribeStopped()");
     },
     onTranscriptionUpdated: function (text: string | undefined) {
-        console.log("Transcriber.onTranscriptionUpdated(" + text + ")");
+        Log.log("Transcriber.onTranscriptionUpdated(" + text + ")");
     },
     onTranscriptionCommitted: function (text: string | undefined) {
-        console.log("Transcriber.onTranscriptionCommitted(" + text + ")");
+        Log.log("Transcriber.onTranscriptionCommitted(" + text + ")");
+    },
+    onSpeechStart: function () {
+        Log.log("Transcriber.onSpeechStart()")
+    },
+    onSpeechEnd: function () {
+        Log.log("Transcriber.onSpeechEnd()")
     },
 };
 

@@ -30,7 +30,7 @@ enum MoonshineLifecycle {
  */
 export default class MoonshineElementManager {
     private boundControlElements: Array<string> = [];
-    private modelURL: string; // defaults to MoonshineSettings.BASE_ASSET_URL in MoonshineModel
+    private modelURL: string; // defaults to Settings.BASE_ASSET_URL in MoonshineModel
     private defaultPostInjectionFunction: Function = (
         controlElement,
         targetInputElement
@@ -71,7 +71,7 @@ export default class MoonshineElementManager {
     };
 
     /**
-     * @param modelURL (Optional) the URL that the MoonshineModel weights should be loaded from, relative to {@link MoonshineSettings.BASE_ASSET_PATH}
+     * @param modelURL (Optional) the URL that the MoonshineModel weights should be loaded from, relative to {@link Settings.BASE_ASSET_PATH}
      * @param styleSheet (Optional) additional CSS styles to append to the base stylesheet
      */
     public constructor(modelURL: string = "", styleSheet: string = styles) {

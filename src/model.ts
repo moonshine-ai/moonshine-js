@@ -1,6 +1,7 @@
 import * as ort from "onnxruntime-web";
 import llamaTokenizer from "llama-tokenizer-js";
-import { MoonshineSettings } from "./constants";
+import { Settings } from "./constants";
+import Log from "./log";
 
 function argMax(array) {
     return [].map
@@ -25,14 +26,14 @@ export default class MoonshineModel {
     /**
      * Create (but do not load) a new MoonshineModel for inference.
      *
-     * @param modelURL A string (relative to {@link MoonshineSettings.BASE_ASSET_PATH}) where the `.onnx` model weights are located.
+     * @param modelURL A string (relative to {@link Settings.BASE_ASSET_PATH}) where the `.onnx` model weights are located.
      *
-     * @remarks Creating a MoonshineModel has the side effect of setting the path to the `onnxruntime-web` `.wasm` to the {@link MoonshineSettings.BASE_ASSET_PATH}
+     * @remarks Creating a MoonshineModel has the side effect of setting the path to the `onnxruntime-web` `.wasm` to the {@link Settings.BASE_ASSET_PATH}
      */
     public constructor(modelURL: string, precision: string = "quantized") {
-        this.modelURL = MoonshineSettings.BASE_ASSET_PATH + modelURL;
+        this.modelURL = Settings.BASE_ASSET_PATH + modelURL;
         this.precision = precision;
-        ort.env.wasm.wasmPaths = MoonshineSettings.BASE_ASSET_PATH;
+        ort.env.wasm.wasmPaths = Settings.BASE_ASSET_PATH;
         this.model = {
             encoder: undefined,
             decoder: undefined,
@@ -87,7 +88,7 @@ export default class MoonshineModel {
 
     /**
      * Tests the inference latency of the current environment. This is useful for determining the appropriate
-     * {@link MoonshineSettings.FRAME_SIZE} and {@link MoonshineSettings.MAX_SPEECH_SECS} for a given execution environment.
+     * {@link Settings.FRAME_SIZE} and {@link Settings.MAX_SPEECH_SECS} for a given execution environment.
      * 
      * @remarks Warning: since this uses noise to benchmark the model, the model will have lower performance if you to use it 
      * for transcription immediately after benchmarking.
@@ -125,7 +126,7 @@ export default class MoonshineModel {
      */
     public async loadModel() {
         const sessionOption = MoonshineModel.getSessionOption();
-        console.log(
+        Log.info(
             "MoonshineModel.loadModel: Using executionProviders: " +
                 sessionOption.executionProviders
         );
@@ -223,7 +224,7 @@ export default class MoonshineModel {
             this.lastLatency = performance.now() - t0;
             return llamaTokenizer.decode(tokens.slice(0, -1));
         } else {
-            console.warn(
+            Log.warn(
                 "MoonshineModel.generate(): Tried to call generate before the model was loaded."
             );
         }

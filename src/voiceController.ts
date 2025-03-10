@@ -1,5 +1,6 @@
 import { TranscriberCallbacks } from "./transcriber";
 import { pipeline } from '@huggingface/transformers';
+import Log from "./log";
 
 type CommandHandlers = {
     [key: string]: (...args: any[]) => any;
@@ -17,6 +18,8 @@ abstract class VoiceController implements TranscriberCallbacks {
     onTranscribeStopped: () => any;
     onTranscriptionCommitted: (text: string | undefined) => any;
     onTranscriptionUpdated: (text: string | undefined) => any;
+    onSpeechStart: () => any;
+    onSpeechEnd: () => any;
 
     public constructor(
         commandHandlers: CommandHandlers,
@@ -26,27 +29,27 @@ abstract class VoiceController implements TranscriberCallbacks {
         this.onModelLoadStarted =
             callbacks.onModelLoadStarted ??
             function () {
-                console.log("VoiceController.onModelLoadStarted()");
+                Log.log("VoiceController.onModelLoadStarted()");
             };
         this.onModelLoaded =
             callbacks.onModelLoaded ??
             function () {
-                console.log("VoiceController.onModelLoaded()");
+                Log.log("VoiceController.onModelLoaded()");
             };
         this.onTranscribeStarted =
             callbacks.onTranscribeStarted ??
             function () {
-                console.log("VoiceController.onTranscribeStarted()");
+                Log.log("VoiceController.onTranscribeStarted()");
             };
         this.onTranscribeStopped =
             callbacks.onTranscribeStopped ??
             function () {
-                console.log("VoiceController.onTranscribeStopped()");
+                Log.log("VoiceController.onTranscribeStopped()");
             };
         this.onTranscriptionCommitted =
             callbacks.onTranscriptionCommitted ??
             function () {
-                console.log("VoiceController.onTranscriptionCommitted()");
+                Log.log("VoiceController.onTranscriptionCommitted()");
             };
     }
 }
@@ -60,7 +63,7 @@ abstract class VoiceController implements TranscriberCallbacks {
 class KeywordSpotter extends VoiceController {
     onTranscriptionUpdated = (text: string | undefined) => {
         if (text) {
-            console.log("KeywordSpotter.onTranscriptionUpdated(" + text + ")");
+            Log.log("KeywordSpotter.onTranscriptionUpdated(" + text + ")");
             text = text.toLowerCase().replace(/[^\w\s]|_/g, "");
             if (this.commandHandlers[text] !== undefined) {
                 this.commandHandlers[text]();
@@ -72,7 +75,7 @@ class KeywordSpotter extends VoiceController {
 /**
  * Implements voice control using intent classification.
  * 
- * Intent classification matches user commands to actions (i.e.,) using semantic similarity. This is most useful
+ * Intent classification matches user commands to actions using semantic similarity. This is most useful
  * when we want to match commands with similar meaning (but not identical wordings) to desired actions, e.g.,
  * matching the commands to "start up", "initialize", and "boot it up" to an intent named "turn on".
  */

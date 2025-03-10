@@ -1,11 +1,12 @@
 import MoonshineModel from "./model";
 import { Transcriber, TranscriberCallbacks } from "./transcriber";
-import { MoonshineSettings } from "./constants";
+import { Settings } from "./constants";
 import { AudioNodeVAD } from "@ricky0123/vad-web";
+import Log from "./log";
 
 /**
  * Implements real-time transcription of an audio stream sourced from a WebAudio-compliant MediaStream object.
- * 
+ *
  * Read more about working with MediaStreams: {@link https://developer.mozilla.org/en-US/docs/Web/API/MediaStream}
  */
 class StreamTranscriber extends Transcriber {
@@ -14,18 +15,19 @@ class StreamTranscriber extends Transcriber {
     private audioBuffer: AudioBuffer | undefined = undefined;
     private voiceActivityDetector: AudioNodeVAD | undefined = undefined;
     private committedTranscript: string = "";
+    private isActive: boolean = false;
 
     /**
      * Creates a transcriber for transcribing a MediaStream from any source. After creating the {@link StreamTranscriber}, you must invoke
      * {@link StreamTranscriber.attachStream} to provide a MediaStream that you want to transcribe.
      *
      * @param modelURL The URL that the underlying {@link MoonshineModel} weights should be loaded from,
-     * relative to {@link MoonshineSettings.BASE_ASSET_PATH}.
-     * 
+     * relative to {@link Settings.BASE_ASSET_PATH}.
+     *
      * @param callbacks A set of {@link TranscriberCallbacks} used to trigger behavior at different steps of the
      * transcription lifecycle. For transcription-only use cases, you should define the {@link TranscriberCallbacks} yourself;
      * when using the transcriber for voice control, you should create a {@link VoiceController} and pass it in.
-     * 
+     *
      * @param useVAD A boolean specifying whether or not to use Voice Activity Detection (VAD) on audio processed by the transcriber.
      * When set to `true`, the transcriber will only process speech at the end of each chunk of voice activity.
      *
@@ -76,36 +78,29 @@ class StreamTranscriber extends Transcriber {
         if (useVAD) {
             this.audioContext = new AudioContext();
             AudioNodeVAD.new(this.audioContext, {
-                onFrameProcessed: (probabilities, frame) => {
-                    // console.log(
-                    //     "StreamTranscriber.onFrameProcessed(" +
-                    //         probabilities +
-                    //         "," +
-                    //         frame +
-                    //         ")"
-                    // );
-                },
+                onFrameProcessed: (probabilities, frame) => {},
                 onVADMisfire: () => {
-                    console.log("StreamTranscriber.onVADMisfire()");
+                    Log.log("StreamTranscriber.onVADMisfire()");
                 },
                 onSpeechStart: () => {
-                    console.log("StreamTranscriber.onSpeechStart()");
-                    this.callbacks.onTranscribeStarted()
+                    Log.log("StreamTranscriber.onSpeechStart()");
+                    this.callbacks.onSpeechStart();
                 },
                 onSpeechEnd: (floatArray) => {
-                    console.log("StreamTranscriber.onSpeechEnd()");
-                    this.callbacks.onTranscribeStopped()
+                    Log.log("StreamTranscriber.onSpeechEnd()");
+                    this.callbacks.onSpeechEnd();
                     Transcriber.model?.generate(floatArray).then((text) => {
-                        this.callbacks.onTranscriptionUpdated(text)
-                        this.callbacks.onTranscriptionCommitted(this.committedTranscript)
-                        this.committedTranscript += " " + text
-                    })
+                        this.callbacks.onTranscriptionUpdated(text);
+                        this.callbacks.onTranscriptionCommitted(
+                            this.committedTranscript
+                        );
+                        this.committedTranscript += " " + text;
+                    });
                 },
             }).then((vad) => {
                 this.voiceActivityDetector = vad;
             });
-        }
-        else {
+        } else {
             this.audioContext = new AudioContext({
                 sampleRate: 16000,
             });
@@ -151,17 +146,18 @@ class StreamTranscriber extends Transcriber {
 
     /**
      * Starts transcription.
-     * 
+     *
      * if `useVAD === true`: generate an updated transcription at the end of every chunk of detected voice activity.
-     * else if `useVAD === false`: generate an updated transcription every {@link MoonshineSettings.FRAME_SIZE} milliseconds. 
-     * 
-     * Transcription will stop when {@link stop} is called, or when {@link MoonshineSettings.MAX_RECORD_MS} is passed (whichever comes first).
-     * 
+     * else if `useVAD === false`: generate an updated transcription every {@link Settings.FRAME_SIZE} milliseconds.
+     *
+     * Transcription will stop when {@link stop} is called, or when {@link Settings.MAX_RECORD_MS} is passed (whichever comes first).
+     *
      * Note that the {@link StreamTranscriber} must have a MediaStream attached via {@link StreamTranscriber.attachStream} before
      * starting transcription.
      */
     async start() {
-        if (this.mediaRecorder.state !== "recording") {
+        if (!this.isActive) {
+            this.isActive = true
             this.committedTranscript = "";
 
             // load model if not loaded
@@ -171,6 +167,7 @@ class StreamTranscriber extends Transcriber {
 
             // use the vad to trigger frame processing, if it exists
             if (this.voiceActivityDetector) {
+                this.callbacks.onTranscribeStarted();
                 this.voiceActivityDetector.start();
             }
             // otherwise process the streaming frames
@@ -182,10 +179,10 @@ class StreamTranscriber extends Transcriber {
                 // fires every MOONSHINE_FRAME_SIZE ms
                 this.mediaRecorder.ondataavailable = (event) => {
                     let bufferSecs = Math.floor(
-                        (audioChunks.length * MoonshineSettings.FRAME_SIZE) /
+                        (audioChunks.length * Settings.FRAME_SIZE) /
                             1000
                     );
-                    if (bufferSecs >= MoonshineSettings.MAX_SPEECH_SECS) {
+                    if (bufferSecs >= Settings.MAX_SPEECH_SECS) {
                         // the next transcript should be "committed" and we should erase the buffer afterwards
                         commitChunk = true;
                     }
@@ -210,36 +207,41 @@ class StreamTranscriber extends Transcriber {
                                     );
                                 }
                                 audioBuffer.copyFromChannel(floatArray, 0);
-                                Transcriber.model?.generate(floatArray).then((text) => {
-                                    if (commitChunk && text) {
-                                        this.committedTranscript =
-                                            this.committedTranscript + " " + text;
-                                        this.callbacks.onTranscriptionCommitted(
-                                            this.committedTranscript
-                                        );
+                                Transcriber.model
+                                    ?.generate(floatArray)
+                                    .then((text) => {
+                                        if (commitChunk && text) {
+                                            this.committedTranscript =
+                                                this.committedTranscript +
+                                                " " +
+                                                text;
+                                            this.callbacks.onTranscriptionCommitted(
+                                                this.committedTranscript
+                                            );
 
-                                        let headerBlob = audioChunks[0];
-                                        // TODO lookback frames?
-                                        audioChunks = [];
-                                        audioChunks.push(headerBlob);
-                                        commitChunk = false;
-                                    }
-                                    else if (!commitChunk) {
-                                        this.callbacks.onTranscriptionUpdated(text);
-                                    }
-                                });
+                                            let headerBlob = audioChunks[0];
+                                            // TODO lookback frames?
+                                            audioChunks = [];
+                                            audioChunks.push(headerBlob);
+                                            commitChunk = false;
+                                        } else if (!commitChunk) {
+                                            this.callbacks.onTranscriptionUpdated(
+                                                text
+                                            );
+                                        }
+                                    });
                             })
                             .catch(() => {});
                     });
                 };
             }
-            this.mediaRecorder.start(MoonshineSettings.FRAME_SIZE);
+            this.mediaRecorder.start(Settings.FRAME_SIZE);
 
             let recorderTimeout = undefined;
-            if (MoonshineSettings.MAX_RECORD_MS) {
+            if (Settings.MAX_RECORD_MS) {
                 recorderTimeout = setTimeout(() => {
                     this.stop();
-                }, MoonshineSettings.MAX_RECORD_MS);
+                }, Settings.MAX_RECORD_MS);
             }
 
             this.mediaRecorder.onstop = () => {
@@ -253,6 +255,7 @@ class StreamTranscriber extends Transcriber {
      * Stops transcription.
      */
     stop() {
+        this.isActive = false
         if (this.voiceActivityDetector) {
             this.voiceActivityDetector.pause();
         }
