@@ -15,7 +15,7 @@ class StreamTranscriber extends Transcriber {
     private audioBuffer: AudioBuffer | undefined = undefined;
     private voiceActivityDetector: AudioNodeVAD | undefined = undefined;
     private committedTranscript: string = "";
-    private isActive: boolean = false;
+    public isActive: boolean = false;
 
     /**
      * Creates a transcriber for transcribing a MediaStream from any source. After creating the {@link StreamTranscriber}, you must invoke
