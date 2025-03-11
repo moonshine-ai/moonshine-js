@@ -52,6 +52,10 @@ abstract class VoiceController implements TranscriberCallbacks {
                 Log.log("VoiceController.onTranscriptionCommitted()");
             };
     }
+
+    public static normalizeText(text: string) {
+        return text.toLowerCase().replace(/[^\w\s]|_/g, "");
+    }
 }
 
 /**
@@ -64,7 +68,7 @@ class KeywordSpotter extends VoiceController {
     onTranscriptionUpdated = (text: string | undefined) => {
         if (text) {
             Log.log("KeywordSpotter.onTranscriptionUpdated(" + text + ")");
-            text = text.toLowerCase().replace(/[^\w\s]|_/g, "");
+            text = VoiceController.normalizeText(text);
             if (this.commandHandlers[text] !== undefined) {
                 this.commandHandlers[text]();
             }
@@ -144,6 +148,7 @@ class IntentClassifier extends VoiceController {
     public async getIntent(text: string): Promise<string> {
         var embeddings = await this.getEmbeddings(text)
         var scores = this.getCosineSimilarityScores(embeddings)
+        Log.log("getIntent() => " + text + " " + scores)
         return Object.keys(this.commandHandlers)[IntentClassifier.maxIndex(scores)]
     }
 
@@ -178,7 +183,7 @@ class IntentClassifier extends VoiceController {
     onTranscriptionUpdated = (text: string | undefined) => {
         if (text) {
             this.getIntent(text).then((intent) => {
-                this.commandHandlers[intent]();
+                this.commandHandlers[intent](VoiceController.normalizeText(text));
             })
         }
     };
