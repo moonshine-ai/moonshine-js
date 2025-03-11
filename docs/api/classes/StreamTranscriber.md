@@ -1,7 +1,7 @@
 undefined
 # Class: StreamTranscriber
 
-Defined in: [streamTranscriber.ts:11](https://github.com/usefulsensors/moonshine-js/blob/main/src/streamTranscriber.ts#L11)
+Defined in: [streamTranscriber.ts:12](https://github.com/usefulsensors/moonshine-js/blob/main/src/streamTranscriber.ts#L12)
 
 Implements real-time transcription of an audio stream sourced from a WebAudio-compliant MediaStream object.
 
@@ -26,7 +26,7 @@ new StreamTranscriber(
    useVAD): StreamTranscriber
 ```
 
-Defined in: [streamTranscriber.ts:70](https://github.com/usefulsensors/moonshine-js/blob/main/src/streamTranscriber.ts#L70)
+Defined in: [streamTranscriber.ts:72](https://github.com/usefulsensors/moonshine-js/blob/main/src/streamTranscriber.ts#L72)
 
 Creates a transcriber for transcribing a MediaStream from any source. After creating the [StreamTranscriber](/docs/api/classes/streamtranscriber), you must invoke
 [StreamTranscriber.attachStream](/docs/api/classes/streamtranscriber#attachstream) to provide a MediaStream that you want to transcribe.
@@ -35,7 +35,7 @@ Creates a transcriber for transcribing a MediaStream from any source. After crea
 
 | Parameter | Type | Default value | Description |
 | ------ | ------ | ------ | ------ |
-| `modelURL` | `string` | `undefined` | The URL that the underlying [MoonshineModel](/docs/api/classes/moonshinemodel) weights should be loaded from, relative to [MoonshineSettings.BASE\_ASSET\_PATH](/docs/api/variables/moonshinesettings#base_asset_path). |
+| `modelURL` | `string` | `undefined` | The URL that the underlying [MoonshineModel](/docs/api/classes/moonshinemodel) weights should be loaded from, relative to [Settings.BASE\_ASSET\_PATH](/docs/api/variables/settings#base_asset_path). |
 | `callbacks` | `Partial`\<[`TranscriberCallbacks`](/docs/api/interfaces/transcribercallbacks)\> | `{}` | A set of [TranscriberCallbacks](/docs/api/interfaces/transcribercallbacks) used to trigger behavior at different steps of the transcription lifecycle. For transcription-only use cases, you should define the [TranscriberCallbacks](/docs/api/interfaces/transcribercallbacks) yourself; when using the transcriber for voice control, you should create a [VoiceController](/docs/api/classes/voicecontroller) and pass it in. |
 | `useVAD` | `boolean` | `false` | A boolean specifying whether or not to use Voice Activity Detection (VAD) on audio processed by the transcriber. When set to `true`, the transcriber will only process speech at the end of each chunk of voice activity. |
 
@@ -90,10 +90,11 @@ Transcriber.constructor
 
 ## Properties
 
-| Property | Modifier | Type | Inherited from | Defined in |
-| ------ | ------ | ------ | ------ | ------ |
-| <a id="callbacks-1"></a> `callbacks` | `public` | [`TranscriberCallbacks`](/docs/api/interfaces/transcribercallbacks) | `Transcriber.callbacks` | [transcriber.ts:66](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L66) |
-| <a id="model"></a> `model` | `static` | [`MoonshineModel`](/docs/api/classes/moonshinemodel) | `Transcriber.model` | [transcriber.ts:65](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L65) |
+| Property | Modifier | Type | Default value | Inherited from | Defined in |
+| ------ | ------ | ------ | ------ | ------ | ------ |
+| <a id="callbacks-1"></a> `callbacks` | `public` | [`TranscriberCallbacks`](/docs/api/interfaces/transcribercallbacks) | `undefined` | `Transcriber.callbacks` | [transcriber.ts:81](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L81) |
+| <a id="isactive"></a> `isActive` | `public` | `boolean` | `false` | - | [streamTranscriber.ts:18](https://github.com/usefulsensors/moonshine-js/blob/main/src/streamTranscriber.ts#L18) |
+| <a id="model"></a> `model` | `static` | [`MoonshineModel`](/docs/api/classes/moonshinemodel) | `undefined` | `Transcriber.model` | [transcriber.ts:80](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L80) |
 
 ## Methods
 
@@ -103,7 +104,7 @@ Transcriber.constructor
 attachStream(stream): void
 ```
 
-Defined in: [streamTranscriber.ts:121](https://github.com/usefulsensors/moonshine-js/blob/main/src/streamTranscriber.ts#L121)
+Defined in: [streamTranscriber.ts:116](https://github.com/usefulsensors/moonshine-js/blob/main/src/streamTranscriber.ts#L116)
 
 Attaches a MediaStream to this [StreamTranscriber](/docs/api/classes/streamtranscriber) for transcription. A MediaStream must be attached before
 starting transcription.
@@ -126,7 +127,7 @@ starting transcription.
 detachStream(): void
 ```
 
-Defined in: [streamTranscriber.ts:134](https://github.com/usefulsensors/moonshine-js/blob/main/src/streamTranscriber.ts#L134)
+Defined in: [streamTranscriber.ts:129](https://github.com/usefulsensors/moonshine-js/blob/main/src/streamTranscriber.ts#L129)
 
 Detaches the MediaStream used for transcription.
 
@@ -142,7 +143,7 @@ Detaches the MediaStream used for transcription.
 getAudioBuffer(): AudioBuffer
 ```
 
-Defined in: [streamTranscriber.ts:148](https://github.com/usefulsensors/moonshine-js/blob/main/src/streamTranscriber.ts#L148)
+Defined in: [streamTranscriber.ts:143](https://github.com/usefulsensors/moonshine-js/blob/main/src/streamTranscriber.ts#L143)
 
 Returns the most recent AudioBuffer that was input to the underlying model for text generation. This is useful in cases where
 we want to double-check the audio being input to the model while debugging.
@@ -161,7 +162,7 @@ An AudioBuffer
 loadModel(): Promise<void>
 ```
 
-Defined in: [transcriber.ts:78](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L78)
+Defined in: [transcriber.ts:93](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L93)
 
 #### Returns
 
@@ -181,14 +182,14 @@ Transcriber.loadModel
 start(): Promise<void>
 ```
 
-Defined in: [streamTranscriber.ts:163](https://github.com/usefulsensors/moonshine-js/blob/main/src/streamTranscriber.ts#L163)
+Defined in: [streamTranscriber.ts:158](https://github.com/usefulsensors/moonshine-js/blob/main/src/streamTranscriber.ts#L158)
 
 Starts transcription.
 
 if `useVAD === true`: generate an updated transcription at the end of every chunk of detected voice activity.
-else if `useVAD === false`: generate an updated transcription every [MoonshineSettings.FRAME\_SIZE](/docs/api/variables/moonshinesettings#frame_size) milliseconds. 
+else if `useVAD === false`: generate an updated transcription every [Settings.FRAME\_SIZE](/docs/api/variables/settings#frame_size) milliseconds.
 
-Transcription will stop when [stop](/docs/api/classes/streamtranscriber#stop) is called, or when [MoonshineSettings.MAX\_RECORD\_MS](/docs/api/variables/moonshinesettings#max_record_ms) is passed (whichever comes first).
+Transcription will stop when [stop](/docs/api/classes/streamtranscriber#stop) is called, or when [Settings.MAX\_RECORD\_MS](/docs/api/variables/settings#max_record_ms) is passed (whichever comes first).
 
 Note that the [StreamTranscriber](/docs/api/classes/streamtranscriber) must have a MediaStream attached via [StreamTranscriber.attachStream](/docs/api/classes/streamtranscriber#attachstream) before
 starting transcription.
@@ -211,7 +212,7 @@ Transcriber.start
 stop(): void
 ```
 
-Defined in: [streamTranscriber.ts:255](https://github.com/usefulsensors/moonshine-js/blob/main/src/streamTranscriber.ts#L255)
+Defined in: [streamTranscriber.ts:257](https://github.com/usefulsensors/moonshine-js/blob/main/src/streamTranscriber.ts#L257)
 
 Stops transcription.
 

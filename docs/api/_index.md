@@ -1,4 +1,4 @@
-undefined
+
 ## Classes
 
 | Class | Description |
@@ -14,11 +14,11 @@ undefined
 
 | Interface | Description |
 | ------ | ------ |
-| [TranscriberCallbacks](/docs/api/interfaces/transcribercallbacks) | Callbacks that are invoked at different phases of the lifecycle as audio is transcribed. You can control the behavior of the application in response to model loading, starting of transcription, stopping of transcription, and updates to the transcription of the audio stream. |
+| [TranscriberCallbacks](/docs/api/interfaces/transcribercallbacks) | Callbacks are invoked at different phases of the lifecycle as audio is transcribed. You can control the behavior of the application in response to model loading, starting of transcription, stopping of transcription, and updates to the transcription of the audio stream. |
 
 ## Variables
 
 | Variable | Description |
 | ------ | ------ |
-| [MoonshineSettings](/docs/api/variables/moonshinesettings) | Global speech-to-text settings. |
+| [Settings](/docs/api/variables/settings) | Global settings for Moonshine.js. |
 

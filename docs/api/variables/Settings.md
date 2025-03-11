@@ -1,18 +1,19 @@
 undefined
-# Variable: MoonshineSettings
+# Variable: Settings
 
 ```ts
-const MoonshineSettings: {
+const Settings: {
   BASE_ASSET_PATH: string;
   FRAME_SIZE: number;
   MAX_RECORD_MS: number;
   MAX_SPEECH_SECS: number;
+  VERBOSE_LOGGING: boolean;
 };
 ```
 
 Defined in: [constants.ts:4](https://github.com/usefulsensors/moonshine-js/blob/main/src/constants.ts#L4)
 
-Global speech-to-text settings.
+Global settings for Moonshine.js.
 
 ## Type declaration
 
@@ -22,4 +23,5 @@ Global speech-to-text settings.
 | <a id="frame_size"></a> `FRAME_SIZE` | `number` | 250 | [constants.ts:5](https://github.com/usefulsensors/moonshine-js/blob/main/src/constants.ts#L5) |
 | <a id="max_record_ms"></a> `MAX_RECORD_MS` | `number` | 60000 | [constants.ts:7](https://github.com/usefulsensors/moonshine-js/blob/main/src/constants.ts#L7) |
 | <a id="max_speech_secs"></a> `MAX_SPEECH_SECS` | `number` | 5 | [constants.ts:6](https://github.com/usefulsensors/moonshine-js/blob/main/src/constants.ts#L6) |
+| <a id="verbose_logging"></a> `VERBOSE_LOGGING` | `boolean` | false | [constants.ts:10](https://github.com/usefulsensors/moonshine-js/blob/main/src/constants.ts#L10) |
 
