@@ -3,7 +3,7 @@ import { TranscriberCallbacks } from "./transcriber";
 import StreamTranscriber from "./streamTranscriber";
 
 /**
- * Accesses the user's microphone and generates transcriptions using an underlying {@link StreamTranscriber}.
+ * Accesses the user's microphone and transcribes their speech.
  */
 class MicrophoneTranscriber extends StreamTranscriber {
 

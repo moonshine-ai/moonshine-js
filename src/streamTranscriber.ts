@@ -10,8 +10,8 @@ import Log from "./log";
  * Read more about working with MediaStreams: {@link https://developer.mozilla.org/en-US/docs/Web/API/MediaStream}
  */
 class StreamTranscriber extends Transcriber {
-    private mediaRecorder: MediaRecorder | undefined = undefined;
-    private audioContext: AudioContext | undefined = undefined;
+    protected mediaRecorder: MediaRecorder | undefined = undefined;
+    protected audioContext: AudioContext | undefined = undefined;
     private audioBuffer: AudioBuffer | undefined = undefined;
     private voiceActivityDetector: AudioNodeVAD | undefined = undefined;
     private committedTranscript: string = "";
