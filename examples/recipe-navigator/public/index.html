@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Recipe Navigator - Moonshine.js</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+            crossorigin="anonymous"
+        />
+        <link rel="icon" type="image/x-icon" href="favicon.svg">
+        <meta name="description" content="Navigate a recipe with your voice while you cook. Powered by Moonshine.js." /><link rel="canonical" href="https://moonshinejs.com/demos/recipe-navigator/" itemprop="url" />
+        <style>
+          h1.scrollable, h2.scrollable, span.scrollable {
+            background-color: #d1e7dd;
+            border-radius: 8px;
+            padding: 0 0.3rem 0 0.3rem;
+          }
+          ol {
+            list-style: none;
+            counter-reset: step-counter; /* Initialize the counter */
+          }
+          ol li {
+            counter-increment: step-counter; /* Increment the counter */
+            margin-bottom: 3rem;
+          }
+          ol li:before {
+            padding: 0 0.3rem 0 0.3rem;
+            font-weight: 600;
+            content: "Step " counter(step-counter) ": ";
+            background: #d1e7dd;
+            text-align: center;
+            border-radius: 8px;
+            display: inline-block;
+          }
+        </style>
+    </head>
+    <body>
+        <div class="container-fluid" style="font-size: 24px">
+            <div
+                class="row justify-content-center align-items-center pt-3 pb-3"
+            >
+                <div class="col-lg-1">
+                    <button class="btn btn-primary" id="startButton">
+                        Enable
+                    </button>
+                </div>
+                <div class="col-lg-5 text-center" style="font-size: 18px">
+                  Navigate between <span class="scrollable bg-success-subtle" id="top">highlighted</span> sections with your voice.
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-6 mt-5">
+                    <img class="img-fluid rounded-2" src="food.jpg" />
+                </div>
+            </div>
+            <div class="row justify-content-center mt-2">
+                  <div class="col-lg-6">
+                    <h1>
+                      <span class="scrollable" id="title">Title:</span> Hoisin Tofu and Broccoli
+                    </h1>
+                  </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <p>
+                        Prep time: 15 min <br />
+                        Cook time: 10 min <br />
+                        Servings: 4 <br />
+                    </p>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <hr />
+                    <h2 class="scrollable" id="ingredients">
+                        Ingredients
+                    </h2>
+                    <ul>
+                        <li>
+                            One block of firm tofu (400g, extra firm will work
+                            too)
+                        </li>
+                        <li>1 head (300 grams stemless) of Broccoli</li>
+                        <li>2-4 cloves of garlic, diced</li>
+                        <li>1/2 cup light soy sauce</li>
+                        <li>1 cup dark soy sauce</li>
+                        <li>2 tablespoons sugar</li>
+                        <li>
+                            2 tablespoons rice vinegar (or any non-balsamic
+                            vinegar)
+                        </li>
+                        <li>1/4 cup vegetable stock (or water)</li>
+                        <li>
+                            2 tablespoons Shaoxing wine or dry cherry (optional)
+                        </li>
+                        <li>1 tablespoon hoisin sauce</li>
+                        <li>1/2 tablespoon cornstarch</li>
+                        <li>1/2 tablespoon sesame oil</li>
+                        <li>2.5 tablespoon peanut oil (any oil will do)</li>
+                        <li>water</li>
+                        <li>50-100g ginger, diced (optional)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-6 mb-5">
+                    <hr />
+                    <h2 class="scrollable" id="directions">
+                      Directions
+                    </h2>
+                    <ol>
+                        <li class="scrollable" id="step-one">
+                            Cut the tofu into 3/4" (2 cm) cubes and place it in
+                            a sealable ziplock bag.
+                        </li>
+                        <li class="scrollable" id="step-two">
+                            Combine 1/4 cup soy sauce, 1/2 teaspoon dark soy
+                            sauce, sugar and rice vinegar ingredients in a bowl
+                            and stir to mix.
+                        </li>
+                        <li class="scrollable" id="step-three">
+                            A food prep rectangular tupperware could work very
+                            well, as you need less marinade to submerge the
+                            tofu. Add tofu and refrigerate for half an hour.
+                        </li>
+                        <li class="scrollable" id="step-four">
+                            Combine vegetable stock, remaining soy sauce, wine,
+                            sesame oil, cornstarch and hoisin sauce into a bowl
+                            and stir until the cornstarch is dissolved.
+                        </li>
+                        <li class="scrollable" id="step-five">
+                            Cut the florets off the stalks of broccoli. Cut into
+                            1cm chunks. Wash and drain if needed.
+                        </li>
+                        <li class="scrollable" id="step-six">
+                            Heat 1/3 cup of water in a large pan over
+                            medium/high heat until boiling. Add broccoli and
+                            cover with a lid. Steam for 2-3 minutes depending on
+                            how hard you want it, then drain and rinse the
+                            remaining water off. Put the broccoli aside.
+                        </li>
+                        <li class="scrollable" id="step-seven">
+                            Add 2 tbsp of oil on the same pan. Cook tofu until
+                            the bottom is golden brown, flip and repeat. Stir a
+                            few times, then move to the side of the pan.
+                        </li>
+                        <li class="scrollable" id="step-eight">
+                            Add more oil, garlic, ginger. Stir until it releases
+                            fragrance - generally less than a minute, then stir
+                            to combine the two.
+                        </li>
+                        <li class="scrollable" id="step-nine">
+                            Cook together until sauce thickens, then add
+                            broccoli and stir to combine.
+                        </li>
+                    </ol>
+                    <hr />
+                    Credit:
+                    <a
+                        href="https://publicdomainrecipes.com/hoisin_tofu_and_broccoli/"
+                        >Public Domain Recipes</a
+                    >
+                </div>
+            </div>
+        </div>
+        <script type="module" src="./index.js"></script>
+    </body>
+</html>
