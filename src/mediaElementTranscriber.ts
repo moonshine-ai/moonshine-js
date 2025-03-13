@@ -2,7 +2,7 @@ import StreamTranscriber from "./streamTranscriber";
 import { TranscriberCallbacks } from "./transcriber";
 
 /**
- * Transcribes the output of an <audio> or <video> element.
+ * Transcribes the output of an `<audio>` or `<video>` HTML element.
  */
 class MediaElementTranscriber extends StreamTranscriber {
     private mediaElement: HTMLMediaElement;
@@ -22,6 +22,12 @@ class MediaElementTranscriber extends StreamTranscriber {
     ) {
         super(modelURL, callbacks, useVAD);
         this.mediaElement = mediaElement;
+        this.mediaElement.addEventListener("play", () => {
+            this.start();
+        });
+        this.mediaElement.addEventListener("pause", () => {
+            this.stop();
+        });
     }
 
     async start() {
