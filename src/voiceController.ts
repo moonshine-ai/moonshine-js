@@ -123,31 +123,64 @@ class IntentClassifier extends VoiceController {
         return maxIndex;
     }
 
+    /**
+     * 
+     * @param text 
+     * @returns 
+     */
     public async getEmbeddings(text: string) {
         const out = await this.featureExtractor(text, { pooling: 'mean', normalize: true });
         return out["ort_tensor"].cpuData
     }
 
-    public async preComputeIntentEmbeddings(intents: string[]) {
-        let preComputedEmbeddings = []
+    /**
+     * 
+     * @param intents 
+     * @returns 
+     */
+    public async getAllEmbeddings(intents: string[]) {
+        let allEmbeddings = []
         for (var i = 0; i < intents.length; i++) {
             var vec = await this.getEmbeddings(intents[i])
-            preComputedEmbeddings.push(vec)
+            allEmbeddings.push(vec)
         }
-        return preComputedEmbeddings
+        return allEmbeddings
     }
 
-    public getCosineSimilarityScores(embeddings) {
+    /**
+     * 
+     * @param embeddings 
+     * @returns 
+     */
+    public getCosineSimilarityScores(embeddings, allEmbeddings) {
         var scores = []
-        this.preComputedEmbeddings.forEach((a) => {
+        allEmbeddings.forEach((a) => {
             scores.push(IntentClassifier.cosineSimilarity(embeddings, a))
         })
         return scores
     }
 
+    /**
+     * 
+     * @param text 
+     * @param candidates 
+     * @returns 
+     */
+    public async getMostSimilar(text: string, candidates: string[]) {
+        const textEmbeddings = await this.getEmbeddings(text)
+        const candidateEmbeddings = await this.getAllEmbeddings(candidates)
+        const scores = this.getCosineSimilarityScores(textEmbeddings, candidateEmbeddings)
+        return candidates[IntentClassifier.maxIndex(scores)]
+    }
+
+    /**
+     * 
+     * @param text 
+     * @returns 
+     */
     public async getIntent(text: string): Promise<string> {
         var embeddings = await this.getEmbeddings(text)
-        var scores = this.getCosineSimilarityScores(embeddings)
+        var scores = this.getCosineSimilarityScores(embeddings, this.preComputedEmbeddings)
         Log.log("getIntent() => " + text + " " + scores)
         return Object.keys(this.commandHandlers)[IntentClassifier.maxIndex(scores)]
     }
@@ -169,7 +202,7 @@ class IntentClassifier extends VoiceController {
         pipeline('feature-extraction', embeddingsModel).then((pipe) => {
             this.featureExtractor = pipe
             if (preComputedEmbeddings === undefined) {
-                this.preComputeIntentEmbeddings(Object.keys(commandHandlers)).then((result) => {
+                this.getAllEmbeddings(Object.keys(commandHandlers)).then((result) => {
                     this.preComputedEmbeddings = result
                 })
             }
@@ -183,7 +216,7 @@ class IntentClassifier extends VoiceController {
     onTranscriptionUpdated = (text: string | undefined) => {
         if (text) {
             this.getIntent(text).then((intent) => {
-                this.commandHandlers[intent](VoiceController.normalizeText(text));
+                this.commandHandlers[intent](VoiceController.normalizeText(text), this);
             })
         }
     };
