@@ -73,3 +73,21 @@ transcriber.start();
 Now the transcription will only update between pauses in speech. 
 
 That's all it takes to get started! Read [the guides](https://moonshinejs.com/docs/guide/) to learn how to transcribe audio from other sources, or to build voice-controlled applications.
+
+## Web Speech Polyfill
+
+Moonshine.js also provides a polyfill for the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API). Usage is as follows:
+
+``` javascript
+import * as Moonshine from 'https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.min.js'
+
+var transcriber = new Moonshine.MoonshineSpeechRecognition()
+
+transcriber.addEventListener("result", (e) => {
+    console.log("result:", e.results[0][0].transcript);
+})
+```
+
+## Credit
+
+Moonshine.js is developed and maintained by [Useful Sensors](https://usefulsensors.com).
