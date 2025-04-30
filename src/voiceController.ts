@@ -12,6 +12,8 @@ type CommandHandlers = {
 abstract class VoiceController implements TranscriberCallbacks {
     commandHandlers: CommandHandlers;
 
+    onPermissionsRequested: () => any;
+    onError: (error) => any;
     onModelLoadStarted: () => any;
     onModelLoaded: () => any;
     onTranscribeStarted: () => any;
@@ -26,6 +28,16 @@ abstract class VoiceController implements TranscriberCallbacks {
         callbacks: Partial<TranscriberCallbacks> = {}
     ) {
         this.commandHandlers = commandHandlers;
+        this.onPermissionsRequested =
+            callbacks.onPermissionsRequested ??
+            function () {
+                Log.log("VoiceController.onPermissionsRequested()");
+            };
+        this.onError =
+            callbacks.onError ??
+            function (error) {
+                Log.error("VoiceController.onError("+ error +")");
+            };
         this.onModelLoadStarted =
             callbacks.onModelLoadStarted ??
             function () {

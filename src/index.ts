@@ -6,9 +6,11 @@ import MoonshineSpeechRecognition from "./webSpeechPolyfill";
 import { TranscriberCallbacks } from "./transcriber";
 import { Settings } from "./constants";
 import { VoiceController, KeywordSpotter, IntentClassifier } from "./voiceController";
+import { MoonshineError } from "./error";
 
 export {
     MoonshineModel,
+    MoonshineError,
     Settings,
     MoonshineSpeechRecognition,
     MicrophoneTranscriber,
