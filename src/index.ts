@@ -2,6 +2,7 @@ import MoonshineModel from "./model";
 import MediaElementTranscriber from "./mediaElementTranscriber"
 import MicrophoneTranscriber from "./microphoneTranscriber";
 import StreamTranscriber from "./streamTranscriber";
+import MoonshineSpeechRecognition from "./webSpeechPolyfill";
 import { TranscriberCallbacks } from "./transcriber";
 import { Settings } from "./constants";
 import { VoiceController, KeywordSpotter, IntentClassifier } from "./voiceController";
@@ -9,6 +10,7 @@ import { VoiceController, KeywordSpotter, IntentClassifier } from "./voiceContro
 export {
     MoonshineModel,
     Settings,
+    MoonshineSpeechRecognition,
     MicrophoneTranscriber,
     MediaElementTranscriber,
     StreamTranscriber,
