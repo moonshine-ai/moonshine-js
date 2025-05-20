@@ -5,6 +5,10 @@ import Log from "./log";
  * Callbacks are invoked at different phases of the lifecycle as audio is transcribed. You can control the behavior of the application
  * in response to model loading, starting of transcription, stopping of transcription, and updates to the transcription of the audio stream.
  *
+ * @property onPermissionsRequested() - called when permissions to a user resource (e.g., microphone) have been requested (but not necessarily granted yet)
+ * 
+ * @property onError(error: MoonshineError) - called when an error occurs.
+ * 
  * @property onModelLoadStarted() - called when the {@link MoonshineModel} begins to load (or download, if hosted elsewhere)
  *
  * @property onModelLoaded() - called when the {@link MoonshineModel} is loaded. This means the Transcriber is now ready to use.
@@ -13,11 +17,11 @@ import Log from "./log";
  *
  * @property onTranscribeStopped() - called once when transcription stops
  *
- * @property onTranscriptionUpdated(text) - called every {@link Settings.FRAME_SIZE} milliseconds while
+ * @property onTranscriptionUpdated(text: string | undefined) - called every {@link Settings.FRAME_SIZE} milliseconds while
  * transcription is active. Use this callback when you don't need long-running transcription - you only care about
  * the most-recent transcription output. Note that the transcription output may be empty in cases where no speech was detected.
  *
- * @property onTranscriptionCommitted(text) - called every {@link Settings.FRAME_SIZE} milliseconds while
+ * @property onTranscriptionCommitted(text: string | undefined) - called every {@link Settings.FRAME_SIZE} milliseconds while
  * transcription is active, and every {@link Settings.MAX_SPEECH_SECS} when the transcription is "committed",
  * i.e., the underlying audio buffer is emptied and the model begins inferences on a fresh buffer. Use this callback
  * for a long-running transcription of audio.
@@ -29,6 +33,10 @@ import Log from "./log";
  * @interface
  */
 interface TranscriberCallbacks {
+    onPermissionsRequested: () => any;
+
+    onError: (error) => any;
+
     onModelLoadStarted: () => any;
 
     onModelLoaded: () => any;
@@ -47,6 +55,12 @@ interface TranscriberCallbacks {
 }
 
 const defaultTranscriberCallbacks: TranscriberCallbacks = {
+    onPermissionsRequested: function () {
+        Log.log("Transcriber.onPermissionsRequested()");
+    },
+    onError: function (error) {
+        Log.error("Transcriber.onError(" + error + ")");
+    },
     onModelLoadStarted: function () {
         Log.log("Transcriber.onModelLoadStarted()");
     },
@@ -66,11 +80,11 @@ const defaultTranscriberCallbacks: TranscriberCallbacks = {
         Log.log("Transcriber.onTranscriptionCommitted(" + text + ")");
     },
     onSpeechStart: function () {
-        Log.log("Transcriber.onSpeechStart()")
+        Log.log("Transcriber.onSpeechStart()");
     },
     onSpeechEnd: function () {
-        Log.log("Transcriber.onSpeechEnd()")
-    },
+        Log.log("Transcriber.onSpeechEnd()");
+    }
 };
 
 /**

@@ -1,6 +1,7 @@
 import { Settings } from "./constants";
 import { TranscriberCallbacks } from "./transcriber";
 import StreamTranscriber from "./streamTranscriber";
+import { MoonshineError } from "./error";
 
 /**
  * Accesses the user's microphone and transcribes their speech.
@@ -65,16 +66,27 @@ class MicrophoneTranscriber extends StreamTranscriber {
      */
     async start() {
         // get stream from microphone input
-        const stream = await navigator.mediaDevices.getUserMedia({
-            audio: {
-                channelCount: 1,
-                echoCancellation: true,
-                autoGainControl: true,
-                noiseSuppression: true,    
+        const status = await navigator.permissions.query({ name: "microphone" as PermissionName });
+        if (status.state == "denied") {
+            this.callbacks.onError(MoonshineError.PermissionDenied)
+        }
+        else {
+            try {
+                this.callbacks.onPermissionsRequested()
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        channelCount: 1,
+                        echoCancellation: true,
+                        autoGainControl: true,
+                        noiseSuppression: true,    
+                    }
+                });
+                super.attachStream(stream);
+                super.start();
+            } catch {
+                this.callbacks.onError(MoonshineError.PermissionDenied)
             }
-        });
-        super.attachStream(stream);
-        super.start();
+        }
     }
 }
 
