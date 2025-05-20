@@ -72,7 +72,7 @@ class StreamTranscriber extends Transcriber {
     public constructor(
         modelURL: string,
         callbacks: Partial<TranscriberCallbacks> = {},
-        useVAD: boolean = false
+        useVAD: boolean = true
     ) {
         super(modelURL, callbacks);
         if (useVAD) {
