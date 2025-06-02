@@ -10,9 +10,9 @@ import Log from "./log";
  * Read more about working with MediaStreams: {@link https://developer.mozilla.org/en-US/docs/Web/API/MediaStream}
  */
 class StreamTranscriber extends Transcriber {
-    protected mediaRecorder: MediaRecorder | undefined = undefined;
     protected audioContext: AudioContext | undefined = undefined;
-    private audioBuffer: AudioBuffer | undefined = undefined;
+    // private audioBuffer: AudioBuffer | undefined = undefined;
+    private frameBuffer: Float32Array | undefined = undefined;
     private voiceActivityDetector: AudioNodeVAD | undefined = undefined;
     private committedTranscript: string = "";
     public isActive: boolean = false;
@@ -75,36 +75,78 @@ class StreamTranscriber extends Transcriber {
         useVAD: boolean = true
     ) {
         super(modelURL, callbacks);
-        if (useVAD) {
-            this.audioContext = new AudioContext();
-            AudioNodeVAD.new(this.audioContext, {
-                onFrameProcessed: (probabilities, frame) => {},
-                onVADMisfire: () => {
-                    Log.log("StreamTranscriber.onVADMisfire()");
-                },
-                onSpeechStart: () => {
-                    Log.log("StreamTranscriber.onSpeechStart()");
-                    this.callbacks.onSpeechStart();
-                },
-                onSpeechEnd: (floatArray) => {
-                    Log.log("StreamTranscriber.onSpeechEnd()");
-                    this.callbacks.onSpeechEnd();
-                    Transcriber.model?.generate(floatArray).then((text) => {
-                        this.callbacks.onTranscriptionUpdated(text);
-                        this.callbacks.onTranscriptionCommitted(
-                            this.committedTranscript
-                        );
-                        this.committedTranscript += " " + text;
-                    });
-                },
-            }).then((vad) => {
-                this.voiceActivityDetector = vad;
-            });
-        } else {
-            this.audioContext = new AudioContext({
-                sampleRate: 16000,
-            });
-        }
+
+        this.audioContext = new AudioContext();
+
+        // streaming parameters
+        const frameSize = 512; // as specified by silero v5
+        const interval = 16; // inference interval
+        const maxFrames = interval * 6; // maximum before clearing buffer
+        this.frameBuffer = new Float32Array(maxFrames * frameSize);
+        var frameCount = 0;
+        var isTalking = false;
+
+        // perform continuous inferences during speech if useVAD is false
+        const onFrameProcessed = useVAD
+            ? (probs, frame) => {}
+            : (probs, frame) => {
+                  if (isTalking) {
+                      if (frameCount <= maxFrames) {
+                          this.frameBuffer.set(frame, frameCount * frameSize);
+                          frameCount += 1;
+                      }
+                      if (frameCount > 0 && frameCount % interval == 0) {
+                          // inference
+                          Transcriber.model
+                              ?.generate(
+                                  this.frameBuffer.subarray(
+                                      0,
+                                      frameCount * frameSize
+                                  )
+                              )
+                              .then((text) => {
+                                  this.callbacks.onTranscriptionUpdated(text);
+                              });
+                      }
+                      if (frameCount >= maxFrames) {
+                          // clear buffer (leave some overhang?)
+                          this.frameBuffer = new Float32Array(maxFrames * frameSize);
+                          frameCount = 0;
+                      }
+                  }
+              };
+
+        AudioNodeVAD.new(this.audioContext, {
+            onFrameProcessed: onFrameProcessed,
+            onVADMisfire: () => {
+                Log.log("StreamTranscriber.onVADMisfire()");
+            },
+            onSpeechStart: () => {
+                Log.log("StreamTranscriber.onSpeechStart()");
+                this.callbacks.onSpeechStart();
+                if (!useVAD) isTalking = true; // flag is only used when streaming
+            },
+            onSpeechEnd: (floatArray) => {
+                Log.log("StreamTranscriber.onSpeechEnd()");
+                this.callbacks.onSpeechEnd();
+                if (!useVAD) {
+                    // flag and buffer only used in streaming mode
+                    isTalking = false;
+                    this.frameBuffer = new Float32Array(maxFrames * frameSize);
+                    frameCount = 0;
+                }
+                Transcriber.model?.generate(floatArray).then((text) => {
+                    this.callbacks.onTranscriptionUpdated(text);
+                    this.callbacks.onTranscriptionCommitted(
+                        this.committedTranscript
+                    );
+                    this.committedTranscript += " " + text;
+                });
+            },
+            model: "v5",
+        }).then((vad) => {
+            this.voiceActivityDetector = vad;
+        });
     }
 
     /**
@@ -114,12 +156,15 @@ class StreamTranscriber extends Transcriber {
      * @param stream A MediaStream to transcribe
      */
     public attachStream(stream: MediaStream) {
-        this.mediaRecorder = new MediaRecorder(stream);
+        //  = new MediaRecorder(stream);
         if (this.voiceActivityDetector) {
             var sourceNode = new MediaStreamAudioSourceNode(this.audioContext, {
                 mediaStream: stream,
             });
             this.voiceActivityDetector.receive(sourceNode);
+            Log.log(
+                "StreamTranscriber.attachStream(): VAD set to receive source node from stream."
+            );
         }
     }
 
@@ -127,11 +172,11 @@ class StreamTranscriber extends Transcriber {
      * Detaches the MediaStream used for transcription.
      */
     public detachStream() {
-        if (this.mediaRecorder) {
-            this.stop();
-            this.mediaRecorder.stream.getTracks().forEach((t) => t.stop());
-            this.mediaRecorder = undefined;
-        }
+        // if (this.mediaRecorder) {
+        //     this.stop();
+        //     this.mediaRecorder.stream.getTracks().forEach((t) => t.stop());
+        //     this.mediaRecorder = undefined;
+        // }
     }
 
     /**
@@ -141,7 +186,10 @@ class StreamTranscriber extends Transcriber {
      * @returns An AudioBuffer
      */
     public getAudioBuffer(): AudioBuffer {
-        return this.audioBuffer;
+        const numChannels = 1;
+        const audioBuffer = this.audioContext.createBuffer(numChannels, this.frameBuffer.length, 16000);
+        audioBuffer.getChannelData(0).set(this.frameBuffer);
+        return audioBuffer;
     }
 
     /**
@@ -157,7 +205,7 @@ class StreamTranscriber extends Transcriber {
      */
     async start() {
         if (!this.isActive) {
-            this.isActive = true
+            this.isActive = true;
             this.committedTranscript = "";
 
             // load model if not loaded
@@ -165,89 +213,8 @@ class StreamTranscriber extends Transcriber {
                 await super.loadModel();
             }
 
-            // use the vad to trigger frame processing, if it exists
-            if (this.voiceActivityDetector) {
-                this.callbacks.onTranscribeStarted();
-                this.voiceActivityDetector.start();
-            }
-            // otherwise process the streaming frames
-            else {
-                this.callbacks.onTranscribeStarted();
-                let audioChunks: Blob[] = []; // buffer of audio blobs from the user mic
-                let commitChunk: boolean = false; // flag to indicate whether the next generation should be committed (and buffer cleared)
-
-                // fires every MOONSHINE_FRAME_SIZE ms
-                this.mediaRecorder.ondataavailable = (event) => {
-                    let bufferSecs = Math.floor(
-                        (audioChunks.length * Settings.FRAME_SIZE) /
-                            1000
-                    );
-                    if (bufferSecs >= Settings.MAX_SPEECH_SECS) {
-                        // the next transcript should be "committed" and we should erase the buffer afterwards
-                        commitChunk = true;
-                    }
-                    audioChunks.push(event.data);
-
-                    const audioBlob = new Blob(audioChunks, {
-                        type: "audio/wav",
-                    });
-
-                    audioBlob.arrayBuffer().then((arrayBuffer) => {
-                        this.audioContext
-                            ?.decodeAudioData(arrayBuffer)
-                            .then((audioBuffer) => {
-                                this.audioBuffer = audioBuffer;
-                                let floatArray = new Float32Array(
-                                    audioBuffer.length
-                                );
-                                if (floatArray.length > 16000 * 30) {
-                                    floatArray = floatArray.subarray(
-                                        0,
-                                        16000 * 30
-                                    );
-                                }
-                                audioBuffer.copyFromChannel(floatArray, 0);
-                                Transcriber.model
-                                    ?.generate(floatArray)
-                                    .then((text) => {
-                                        if (commitChunk && text) {
-                                            this.committedTranscript =
-                                                this.committedTranscript +
-                                                " " +
-                                                text;
-                                            this.callbacks.onTranscriptionCommitted(
-                                                this.committedTranscript
-                                            );
-
-                                            let headerBlob = audioChunks[0];
-                                            // TODO lookback frames?
-                                            audioChunks = [];
-                                            audioChunks.push(headerBlob);
-                                            commitChunk = false;
-                                        } else if (!commitChunk) {
-                                            this.callbacks.onTranscriptionUpdated(
-                                                text
-                                            );
-                                        }
-                                    });
-                            })
-                            .catch(() => {});
-                    });
-                };
-            }
-            this.mediaRecorder.start(Settings.FRAME_SIZE);
-
-            let recorderTimeout = undefined;
-            if (Settings.MAX_RECORD_MS) {
-                recorderTimeout = setTimeout(() => {
-                    this.stop();
-                }, Settings.MAX_RECORD_MS);
-            }
-
-            this.mediaRecorder.onstop = () => {
-                if (recorderTimeout) clearTimeout(recorderTimeout);
-                this.callbacks.onTranscribeStopped();
-            };
+            this.callbacks.onTranscribeStarted();
+            this.voiceActivityDetector.start();
         }
     }
 
@@ -255,14 +222,14 @@ class StreamTranscriber extends Transcriber {
      * Stops transcription.
      */
     stop() {
-        this.isActive = false
+        this.isActive = false;
         if (this.voiceActivityDetector) {
             this.voiceActivityDetector.pause();
         }
-        if (this.mediaRecorder) {
-            this.audioBuffer = undefined;
-            this.mediaRecorder.stop();
-        }
+        // if (this.mediaRecorder) {
+        //     this.audioBuffer = undefined;
+        //     this.mediaRecorder.stop();
+        // }
     }
 }
 

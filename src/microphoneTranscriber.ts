@@ -48,7 +48,7 @@ class MicrophoneTranscriber extends StreamTranscriber {
     public constructor(
         modelURL: string,
         callbacks: Partial<TranscriberCallbacks> = {},
-        useVAD: boolean = false
+        useVAD: boolean = true
     ) {
         super(modelURL, callbacks, useVAD);
     }
@@ -78,7 +78,8 @@ class MicrophoneTranscriber extends StreamTranscriber {
                         channelCount: 1,
                         echoCancellation: true,
                         autoGainControl: true,
-                        noiseSuppression: true,    
+                        noiseSuppression: true,
+                        sampleRate: 16000 
                     }
                 });
                 super.attachStream(stream);
