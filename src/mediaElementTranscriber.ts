@@ -5,6 +5,7 @@ import { TranscriberCallbacks } from "./transcriber";
  * Transcribes the output of an `<audio>` or `<video>` HTML element.
  */
 class MediaElementTranscriber extends StreamTranscriber {
+    private isAttached: boolean = false;
     private mediaElement: HTMLMediaElement;
 
     /**
@@ -18,7 +19,7 @@ class MediaElementTranscriber extends StreamTranscriber {
         mediaElement: HTMLMediaElement,
         modelURL: string,
         callbacks: Partial<TranscriberCallbacks> = {},
-        useVAD: boolean = false
+        useVAD: boolean = true
     ) {
         super(modelURL, callbacks, useVAD);
         this.mediaElement = mediaElement;
@@ -31,7 +32,7 @@ class MediaElementTranscriber extends StreamTranscriber {
     }
 
     async start() {
-        if (!this.mediaRecorder) {
+        if (!this.isAttached) {
             // source: media element
             const source = this.audioContext.createMediaElementSource(
                 this.mediaElement
@@ -47,6 +48,7 @@ class MediaElementTranscriber extends StreamTranscriber {
             source.connect(destination);
 
             super.attachStream(stream);
+            this.isAttached = true;
         }
         super.start();
     }
