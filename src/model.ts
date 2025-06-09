@@ -31,9 +31,9 @@ export default class MoonshineModel {
      * @remarks Creating a MoonshineModel has the side effect of setting the path to the `onnxruntime-web` `.wasm` to the {@link Settings.BASE_ASSET_PATH}
      */
     public constructor(modelURL: string, precision: string = "quantized") {
-        this.modelURL = Settings.BASE_ASSET_PATH + modelURL;
+        this.modelURL = Settings.BASE_ASSET_PATH.MOONSHINE + modelURL;
         this.precision = precision;
-        ort.env.wasm.wasmPaths = Settings.BASE_ASSET_PATH;
+        ort.env.wasm.wasmPaths = Settings.BASE_ASSET_PATH.ONNX_RUNTIME;
         this.model = {
             encoder: undefined,
             decoder: undefined,
@@ -89,8 +89,8 @@ export default class MoonshineModel {
     /**
      * Tests the inference latency of the current environment. This is useful for determining the appropriate
      * {@link Settings.FRAME_SIZE} and {@link Settings.MAX_SPEECH_SECS} for a given execution environment.
-     * 
-     * @remarks Warning: since this uses noise to benchmark the model, the model will have lower performance if you to use it 
+     *
+     * @remarks Warning: since this uses noise to benchmark the model, the model will have lower performance if you to use it
      * for transcription immediately after benchmarking.
      *
      * @param sampleSize (Optional) The number of samples to use for computing the benchmark

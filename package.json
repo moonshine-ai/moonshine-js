@@ -13,7 +13,8 @@
   "dependencies": {
     "@huggingface/transformers": "^3.3.3",
     "@ricky0123/vad-web": "^0.0.22",
-    "llama-tokenizer-js": "^1.2.2"
+    "llama-tokenizer-js": "^1.2.2",
+    "onnxruntime-web": "^1.22.0"
   },
   "devDependencies": {
     "@huggingface/hub": "^0.19.0",

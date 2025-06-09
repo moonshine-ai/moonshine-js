@@ -110,7 +110,9 @@ class StreamTranscriber extends Transcriber {
                       }
                       if (frameCount >= maxFrames) {
                           // clear buffer (leave some overhang?)
-                          this.frameBuffer = new Float32Array(maxFrames * frameSize);
+                          this.frameBuffer = new Float32Array(
+                              maxFrames * frameSize
+                          );
                           frameCount = 0;
                       }
                   }
@@ -144,6 +146,8 @@ class StreamTranscriber extends Transcriber {
                 });
             },
             model: "v5",
+            baseAssetPath: Settings.BASE_ASSET_PATH.SILERO_VAD,
+            onnxWASMBasePath: Settings.BASE_ASSET_PATH.ONNX_RUNTIME
         }).then((vad) => {
             this.voiceActivityDetector = vad;
         });
@@ -187,7 +191,11 @@ class StreamTranscriber extends Transcriber {
      */
     public getAudioBuffer(): AudioBuffer {
         const numChannels = 1;
-        const audioBuffer = this.audioContext.createBuffer(numChannels, this.frameBuffer.length, 16000);
+        const audioBuffer = this.audioContext.createBuffer(
+            numChannels,
+            this.frameBuffer.length,
+            16000
+        );
         audioBuffer.getChannelData(0).set(this.frameBuffer);
         return audioBuffer;
     }
