@@ -1,5 +1,5 @@
 /**
- * Global settings for Moonshine.js.
+ * Global settings for MoonshineJS.
  */
 export const Settings = {
     FRAME_SIZE: 250,

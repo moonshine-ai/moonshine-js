@@ -20,5 +20,5 @@
 
 | Variable | Description |
 | ------ | ------ |
-| [Settings](/docs/api/variables/settings) | Global settings for Moonshine.js. |
+| [Settings](/docs/api/variables/settings) | Global settings for MoonshineJS. |
 

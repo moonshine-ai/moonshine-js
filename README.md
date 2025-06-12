@@ -1,6 +1,6 @@
-# Moonshine.js
+# MoonshineJS
 
-Moonshine.js makes it easy for web developers to build modern, speech-driven web experiences without sacrificing user privacy. We build on three key principles:
+MoonshineJS makes it easy for web developers to build modern, speech-driven web experiences without sacrificing user privacy. We build on three key principles:
 
 - **Fast Transcription**: simply connect a WebAudio-compliant media stream from any browser audio source and generate rapid transcriptions of speech.
 - **Easy Voice Control**: build feature-rich voice-controlled web apps in < 10 lines of code.
@@ -10,7 +10,7 @@ _Note: This package is currently in beta, and breaking changes may occur between
 
 ## Installation
 
-You can use Moonshine.js via CDN, or you can install it with `npm`. Simply import the package depending on your preferred method.
+You can use MoonshineJS via CDN, or you can install it with `npm`. Simply import the package depending on your preferred method.
 
 ### Via CDN
 
@@ -76,7 +76,7 @@ That's all it takes to get started! Read [the guides](https://moonshinejs.com/do
 
 ## Web Speech Polyfill
 
-Moonshine.js also provides a polyfill for the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API). Usage is as follows:
+MoonshineJS also provides a polyfill for the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API). Usage is as follows:
 
 ``` javascript
 import * as Moonshine from 'https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.min.js'
@@ -90,4 +90,4 @@ transcriber.addEventListener("result", (e) => {
 
 ## Credit
 
-Moonshine.js is developed and maintained by [Useful Sensors](https://usefulsensors.com).
+MoonshineJS is developed and maintained by [Useful Sensors](https://usefulsensors.com).
