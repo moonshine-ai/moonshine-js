@@ -1,0 +1,8 @@
+examples
+docs
+.DS_Store
+dist/model/base/float
+dist/model/base/quantized_4bit
+dist/model/tiny/float
+dist/model/tiny/quantized_4bit
+dist/model/base-es

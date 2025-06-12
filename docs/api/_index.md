@@ -1,3 +1,9 @@
+undefined
+## Enumerations
+
+| Enumeration | Description |
+| ------ | ------ |
+| [MoonshineError](/docs/api/enumerations/moonshineerror) | Errors that can occur during usage of MoonshineJS, along with a descriptive message. |
 
 ## Classes
 
@@ -5,8 +11,10 @@
 | ------ | ------ |
 | [IntentClassifier](/docs/api/classes/intentclassifier) | Implements voice control using intent classification. |
 | [KeywordSpotter](/docs/api/classes/keywordspotter) | Implements voice control using basic keyword spotting. |
-| [MicrophoneTranscriber](/docs/api/classes/microphonetranscriber) | Accesses the user's microphone and generates transcriptions using an underlying [StreamTranscriber](/docs/api/classes/streamtranscriber). |
+| [MediaElementTranscriber](/docs/api/classes/mediaelementtranscriber) | Transcribes the output of an `<audio>` or `<video>` HTML element. |
+| [MicrophoneTranscriber](/docs/api/classes/microphonetranscriber) | Accesses the user's microphone and transcribes their speech. |
 | [MoonshineModel](/docs/api/classes/moonshinemodel) | Implements speech-to-text inferences with Moonshine models. |
+| [MoonshineSpeechRecognition](/docs/api/classes/moonshinespeechrecognition) | - |
 | [StreamTranscriber](/docs/api/classes/streamtranscriber) | Implements real-time transcription of an audio stream sourced from a WebAudio-compliant MediaStream object. |
 | [VoiceController](/docs/api/classes/voicecontroller) | An interface for invoking voice-controlled actions on a page using speech transcribed by a Transcriber. |
 
