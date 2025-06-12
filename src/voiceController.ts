@@ -1,5 +1,5 @@
 import { TranscriberCallbacks } from "./transcriber";
-import { pipeline } from '@huggingface/transformers';
+import { pipeline } from "@huggingface/transformers";
 import Log from "./log";
 
 type CommandHandlers = {
@@ -36,7 +36,7 @@ abstract class VoiceController implements TranscriberCallbacks {
         this.onError =
             callbacks.onError ??
             function (error) {
-                Log.error("VoiceController.onError("+ error +")");
+                Log.error("VoiceController.onError(" + error + ")");
             };
         this.onModelLoadStarted =
             callbacks.onModelLoadStarted ??
@@ -63,6 +63,16 @@ abstract class VoiceController implements TranscriberCallbacks {
             function () {
                 Log.log("VoiceController.onTranscriptionCommitted()");
             };
+        this.onSpeechStart =
+            callbacks.onSpeechStart ??
+            function () {
+                Log.log("VoiceController.onSpeechStart()");
+            };
+        this.onSpeechEnd =
+            callbacks.onSpeechEnd ??
+            function () {
+                Log.log("VoiceController.onSpeechEnd()");
+            };
     }
 
     public static normalizeText(text: string) {
@@ -71,9 +81,9 @@ abstract class VoiceController implements TranscriberCallbacks {
 }
 
 /**
- * Implements voice control using basic keyword spotting. 
- * 
- * Keyword spotting is most useful in cases where we need to match EXACT user command phrases to actions 
+ * Implements voice control using basic keyword spotting.
+ *
+ * Keyword spotting is most useful in cases where we need to match EXACT user command phrases to actions
  * with no ambiguity, e.g., matching the exact words "scroll up" to a scroll up action.
  */
 class KeywordSpotter extends VoiceController {
@@ -90,7 +100,7 @@ class KeywordSpotter extends VoiceController {
 
 /**
  * Implements voice control using intent classification.
- * 
+ *
  * Intent classification matches user commands to actions using semantic similarity. This is most useful
  * when we want to match commands with similar meaning (but not identical wordings) to desired actions, e.g.,
  * matching the commands to "start up", "initialize", and "boot it up" to an intent named "turn on".
@@ -104,7 +114,7 @@ class IntentClassifier extends VoiceController {
         var mA = 0;
         var mB = 0;
 
-        for(var i = 0; i < A.length; i++) {
+        for (var i = 0; i < A.length; i++) {
             dotproduct += A[i] * B[i];
             mA += A[i] * A[i];
             mB += B[i] * B[i];
@@ -136,91 +146,103 @@ class IntentClassifier extends VoiceController {
     }
 
     /**
-     * 
-     * @param text 
-     * @returns 
+     *
+     * @param text
+     * @returns
      */
     public async getEmbeddings(text: string) {
-        const out = await this.featureExtractor(text, { pooling: 'mean', normalize: true });
-        return out["ort_tensor"].cpuData
+        const out = await this.featureExtractor(text, {
+            pooling: "mean",
+            normalize: true,
+        });
+        return out["ort_tensor"].cpuData;
     }
 
     /**
-     * 
-     * @param intents 
-     * @returns 
+     *
+     * @param intents
+     * @returns
      */
     public async getAllEmbeddings(intents: string[]) {
-        let allEmbeddings = []
+        let allEmbeddings = [];
         for (var i = 0; i < intents.length; i++) {
-            var vec = await this.getEmbeddings(intents[i])
-            allEmbeddings.push(vec)
+            var vec = await this.getEmbeddings(intents[i]);
+            allEmbeddings.push(vec);
         }
-        return allEmbeddings
+        return allEmbeddings;
     }
 
     /**
-     * 
-     * @param embeddings 
-     * @returns 
+     *
+     * @param embeddings
+     * @returns
      */
     public getCosineSimilarityScores(embeddings, allEmbeddings) {
-        var scores = []
+        var scores = [];
         allEmbeddings.forEach((a) => {
-            scores.push(IntentClassifier.cosineSimilarity(embeddings, a))
-        })
-        return scores
+            scores.push(IntentClassifier.cosineSimilarity(embeddings, a));
+        });
+        return scores;
     }
 
     /**
-     * 
-     * @param text 
-     * @param candidates 
-     * @returns 
+     *
+     * @param text
+     * @param candidates
+     * @returns
      */
     public async getMostSimilar(text: string, candidates: string[]) {
-        const textEmbeddings = await this.getEmbeddings(text)
-        const candidateEmbeddings = await this.getAllEmbeddings(candidates)
-        const scores = this.getCosineSimilarityScores(textEmbeddings, candidateEmbeddings)
-        return candidates[IntentClassifier.maxIndex(scores)]
+        const textEmbeddings = await this.getEmbeddings(text);
+        const candidateEmbeddings = await this.getAllEmbeddings(candidates);
+        const scores = this.getCosineSimilarityScores(
+            textEmbeddings,
+            candidateEmbeddings
+        );
+        return candidates[IntentClassifier.maxIndex(scores)];
     }
 
     /**
-     * 
-     * @param text 
-     * @returns 
+     *
+     * @param text
+     * @returns
      */
     public async getIntent(text: string): Promise<string> {
-        var embeddings = await this.getEmbeddings(text)
-        var scores = this.getCosineSimilarityScores(embeddings, this.preComputedEmbeddings)
-        Log.log("getIntent() => " + text + " " + scores)
-        return Object.keys(this.commandHandlers)[IntentClassifier.maxIndex(scores)]
+        var embeddings = await this.getEmbeddings(text);
+        var scores = this.getCosineSimilarityScores(
+            embeddings,
+            this.preComputedEmbeddings
+        );
+        Log.log("getIntent() => " + text + " " + scores);
+        return Object.keys(this.commandHandlers)[
+            IntentClassifier.maxIndex(scores)
+        ];
     }
 
     /**
-     * 
-     * @param commandHandlers 
-     * @param callbacks 
-     * @param embeddingsModel 
-     * @param preComputedEmbeddings 
+     *
+     * @param commandHandlers
+     * @param callbacks
+     * @param embeddingsModel
+     * @param preComputedEmbeddings
      */
     public constructor(
         commandHandlers: CommandHandlers,
         callbacks: Partial<TranscriberCallbacks> = {},
-        embeddingsModel: string = 'Xenova/all-MiniLM-L6-v2',
+        embeddingsModel: string = "Xenova/all-MiniLM-L6-v2",
         preComputedEmbeddings: string | undefined = undefined
     ) {
-        super(commandHandlers, callbacks)
-        pipeline('feature-extraction', embeddingsModel).then((pipe) => {
-            this.featureExtractor = pipe
+        super(commandHandlers, callbacks);
+        pipeline("feature-extraction", embeddingsModel).then((pipe) => {
+            this.featureExtractor = pipe;
             if (preComputedEmbeddings === undefined) {
-                this.getAllEmbeddings(Object.keys(commandHandlers)).then((result) => {
-                    this.preComputedEmbeddings = result
-                })
-            }
-            else {
+                this.getAllEmbeddings(Object.keys(commandHandlers)).then(
+                    (result) => {
+                        this.preComputedEmbeddings = result;
+                    }
+                );
+            } else {
                 // TODO instead fetch this from a url to some json
-                this.preComputedEmbeddings = preComputedEmbeddings
+                this.preComputedEmbeddings = preComputedEmbeddings;
             }
         });
     }
@@ -228,8 +250,11 @@ class IntentClassifier extends VoiceController {
     onTranscriptionUpdated = (text: string | undefined) => {
         if (text) {
             this.getIntent(text).then((intent) => {
-                this.commandHandlers[intent](VoiceController.normalizeText(text), this);
-            })
+                this.commandHandlers[intent](
+                    VoiceController.normalizeText(text),
+                    this
+                );
+            });
         }
     };
 }

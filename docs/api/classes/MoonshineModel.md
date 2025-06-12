@@ -59,7 +59,7 @@ The average inference latency (in ms) over the number of samples taken.
 
 #### Remarks
 
-Warning: since this uses noise to benchmark the model, the model will have lower performance if you to use it 
+Warning: since this uses noise to benchmark the model, the model will have lower performance if you to use it
 for transcription immediately after benchmarking.
 
 ***

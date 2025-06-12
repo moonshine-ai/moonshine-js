@@ -11,7 +11,6 @@ import Log from "./log";
  */
 class StreamTranscriber extends Transcriber {
     protected audioContext: AudioContext | undefined = undefined;
-    // private audioBuffer: AudioBuffer | undefined = undefined;
     private frameBuffer: Float32Array | undefined = undefined;
     private voiceActivityDetector: AudioNodeVAD | undefined = undefined;
     private committedTranscript: string = "";
@@ -174,13 +173,10 @@ class StreamTranscriber extends Transcriber {
 
     /**
      * Detaches the MediaStream used for transcription.
+     * @todo
      */
     public detachStream() {
-        // if (this.mediaRecorder) {
-        //     this.stop();
-        //     this.mediaRecorder.stream.getTracks().forEach((t) => t.stop());
-        //     this.mediaRecorder = undefined;
-        // }
+        // TODO
     }
 
     /**
@@ -232,12 +228,9 @@ class StreamTranscriber extends Transcriber {
     stop() {
         this.isActive = false;
         if (this.voiceActivityDetector) {
+            this.callbacks.onTranscribeStopped();
             this.voiceActivityDetector.pause();
         }
-        // if (this.mediaRecorder) {
-        //     this.audioBuffer = undefined;
-        //     this.mediaRecorder.stop();
-        // }
     }
 }
 

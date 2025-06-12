@@ -86,6 +86,7 @@ class MicrophoneTranscriber extends StreamTranscriber {
                 super.start();
             } catch {
                 this.callbacks.onError(MoonshineError.PermissionDenied)
+                super.stop();
             }
         }
     }

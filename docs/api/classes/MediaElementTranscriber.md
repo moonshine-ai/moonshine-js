@@ -1,9 +1,9 @@
 undefined
-# Class: MicrophoneTranscriber
+# Class: MediaElementTranscriber
 
-Defined in: [microphoneTranscriber.ts:9](https://github.com/usefulsensors/moonshine-js/blob/main/src/microphoneTranscriber.ts#L9)
+Defined in: [mediaElementTranscriber.ts:7](https://github.com/usefulsensors/moonshine-js/blob/main/src/mediaElementTranscriber.ts#L7)
 
-Accesses the user's microphone and transcribes their speech.
+Transcribes the output of an `<audio>` or `<video>` HTML element.
 
 ## Extends
 
@@ -11,65 +11,30 @@ Accesses the user's microphone and transcribes their speech.
 
 ## Constructors
 
-### new MicrophoneTranscriber()
+### new MediaElementTranscriber()
 
 ```ts
-new MicrophoneTranscriber(
+new MediaElementTranscriber(
+   mediaElement, 
    modelURL, 
    callbacks, 
-   useVAD): MicrophoneTranscriber
+   useVAD): MediaElementTranscriber
 ```
 
-Defined in: [microphoneTranscriber.ts:48](https://github.com/usefulsensors/moonshine-js/blob/main/src/microphoneTranscriber.ts#L48)
-
-Creates a transcriber for transcribing an audio stream from a mic.
+Defined in: [mediaElementTranscriber.ts:18](https://github.com/usefulsensors/moonshine-js/blob/main/src/mediaElementTranscriber.ts#L18)
 
 #### Parameters
 
-| Parameter | Type | Default value |
-| ------ | ------ | ------ |
-| `modelURL` | `string` | `undefined` |
-| `callbacks` | `Partial`\<[`TranscriberCallbacks`](/docs/api/interfaces/transcribercallbacks)\> | `{}` |
-| `useVAD` | `boolean` | `true` |
+| Parameter | Type | Default value | Description |
+| ------ | ------ | ------ | ------ |
+| `mediaElement` | `HTMLMediaElement` | `undefined` |  |
+| `modelURL` | `string` | `undefined` |  |
+| `callbacks` | `Partial`\<[`TranscriberCallbacks`](/docs/api/interfaces/transcribercallbacks)\> | `{}` |  |
+| `useVAD` | `boolean` | `true` |  |
 
 #### Returns
 
-[`MicrophoneTranscriber`](/docs/api/classes/microphonetranscriber)
-
-#### Example
-
-This basic example demonstrates the use of the transcriber with custom callbacks:
-
-``` ts
-import MicrophoneTranscriber from "@usefulsensors/moonshine-js";
-
-var transcriber = new MicrophoneTranscriber(
-     "model/tiny"
-     {
-         onModelLoadStarted() {
-             console.log("onModelLoadStarted()");
-         },
-         onTranscribeStarted() {
-             console.log("onTranscribeStarted()");
-         },
-         onTranscribeStopped() {
-             console.log("onTranscribeStopped()");
-         },
-         onTranscriptionUpdated(text: string | undefined) {
-             console.log(
-                 "onTranscriptionUpdated(" + text + ")"
-             );
-         },
-         onTranscriptionCommitted(text: string | undefined) {
-             console.log(
-                 "onTranscriptionCommitted(" + text + ")"
-             );
-         },
-     },
-);
-
-transcriber.start();
-```
+[`MediaElementTranscriber`](/docs/api/classes/mediaelementtranscriber)
 
 #### Overrides
 
@@ -182,17 +147,17 @@ Defined in: [transcriber.ts:107](https://github.com/usefulsensors/moonshine-js/b
 start(): Promise<void>
 ```
 
-Defined in: [microphoneTranscriber.ts:67](https://github.com/usefulsensors/moonshine-js/blob/main/src/microphoneTranscriber.ts#L67)
+Defined in: [mediaElementTranscriber.ts:34](https://github.com/usefulsensors/moonshine-js/blob/main/src/mediaElementTranscriber.ts#L34)
 
 Starts transcription.
 
-This will request microphone permissions (if not already provided), load the model (if not already loaded), and do
-one of the following:
-
 if `useVAD === true`: generate an updated transcription at the end of every chunk of detected voice activity.
-else if `useVAD === false`: generate an updated transcription every [Settings.FRAME\_SIZE](/docs/api/variables/settings#frame_size) milliseconds. 
+else if `useVAD === false`: generate an updated transcription every [Settings.FRAME\_SIZE](/docs/api/variables/settings#frame_size) milliseconds.
 
-Transcription will stop when [stop](/docs/api/classes/microphonetranscriber#stop) is called, or when [Settings.MAX\_RECORD\_MS](/docs/api/variables/settings#max_record_ms) is passed (whichever comes first).
+Transcription will stop when [stop](/docs/api/classes/mediaelementtranscriber#stop) is called, or when [Settings.MAX\_RECORD\_MS](/docs/api/variables/settings#max_record_ms) is passed (whichever comes first).
+
+Note that the [StreamTranscriber](/docs/api/classes/streamtranscriber) must have a MediaStream attached via [StreamTranscriber.attachStream](/docs/api/classes/streamtranscriber#attachstream) before
+starting transcription.
 
 #### Returns
 
