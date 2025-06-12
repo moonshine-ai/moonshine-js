@@ -81,7 +81,7 @@ function App() {
             <line className="st1" id="l8" x1="669.8" y1="245.9" x2="669.8" y2="373.7"/>
           </svg>
         </div>
-        <h1>Moonshine.js</h1>
+        <h1>MoonshineJS</h1>
         <p>fast and accurate speech-to-text models running in your browser</p>
       </div>
       <div className="row justify-content-center align-items-center">

@@ -13,7 +13,7 @@ const Settings: {
 
 Defined in: [constants.ts:4](https://github.com/usefulsensors/moonshine-js/blob/main/src/constants.ts#L4)
 
-Global settings for Moonshine.js.
+Global settings for MoonshineJS.
 
 ## Type declaration
 

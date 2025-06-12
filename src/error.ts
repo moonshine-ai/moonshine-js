@@ -1,5 +1,5 @@
 /**
- * Errors that can occur during usage of Moonshine.js, along with a descriptive message.
+ * Errors that can occur during usage of MoonshineJS, along with a descriptive message.
  * 
  * These are passed to the onError {@link TranscriberCallbacks} when an error occurs so that the developer
  * can implement error handling as necessary for their application. 
