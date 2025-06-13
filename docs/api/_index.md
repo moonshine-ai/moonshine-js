@@ -15,8 +15,8 @@ undefined
 | [MicrophoneTranscriber](/docs/api/classes/microphonetranscriber) | Accesses the user's microphone and transcribes their speech. |
 | [MoonshineModel](/docs/api/classes/moonshinemodel) | Implements speech-to-text inferences with Moonshine models. |
 | [MoonshineSpeechRecognition](/docs/api/classes/moonshinespeechrecognition) | - |
-| [StreamTranscriber](/docs/api/classes/streamtranscriber) | Implements real-time transcription of an audio stream sourced from a WebAudio-compliant MediaStream object. |
-| [VoiceController](/docs/api/classes/voicecontroller) | An interface for invoking voice-controlled actions on a page using speech transcribed by a Transcriber. |
+| [Transcriber](/docs/api/classes/transcriber) | Implements real-time transcription of an audio stream sourced from a WebAudio-compliant MediaStream object. |
+| [VoiceController](/docs/api/classes/voicecontroller) | An interface for invoking voice-controlled actions on a page using speech transcribed by a [Transcriber](/docs/api/classes/transcriber). |
 
 ## Interfaces
 

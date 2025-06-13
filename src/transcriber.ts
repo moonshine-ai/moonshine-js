@@ -1,4 +1,6 @@
+import { Settings } from "./constants";
 import MoonshineModel from "./model";
+import { AudioNodeVAD } from "@ricky0123/vad-web";
 import Log from "./log";
 
 /**
@@ -6,9 +8,9 @@ import Log from "./log";
  * in response to model loading, starting of transcription, stopping of transcription, and updates to the transcription of the audio stream.
  *
  * @property onPermissionsRequested() - called when permissions to a user resource (e.g., microphone) have been requested (but not necessarily granted yet)
- * 
+ *
  * @property onError(error: MoonshineError) - called when an error occurs.
- * 
+ *
  * @property onModelLoadStarted() - called when the {@link MoonshineModel} begins to load (or download, if hosted elsewhere)
  *
  * @property onModelLoaded() - called when the {@link MoonshineModel} is loaded. This means the Transcriber is now ready to use.
@@ -25,9 +27,9 @@ import Log from "./log";
  * transcription is active, and every {@link Settings.MAX_SPEECH_SECS} when the transcription is "committed",
  * i.e., the underlying audio buffer is emptied and the model begins inferences on a fresh buffer. Use this callback
  * for a long-running transcription of audio.
- * 
+ *
  * @property onSpeechStart() - called when the VAD model detects the start of speech if `useVAD === true`.
- * 
+ *
  * @property onSpeechEnd() - called when the VAD model detects the end of speech if `useVAD === true`.
  *
  * @interface
@@ -84,31 +86,252 @@ const defaultTranscriberCallbacks: TranscriberCallbacks = {
     },
     onSpeechEnd: function () {
         Log.log("Transcriber.onSpeechEnd()");
-    }
+    },
 };
 
 /**
- * An abstract transcriber for speech-to-text processing.
+ * Implements real-time transcription of an audio stream sourced from a WebAudio-compliant MediaStream object.
+ *
+ * Read more about working with MediaStreams: {@link https://developer.mozilla.org/en-US/docs/Web/API/MediaStream}
  */
-abstract class Transcriber {
+class Transcriber {
+    private vadModel: AudioNodeVAD;
     static model: MoonshineModel;
     callbacks: TranscriberCallbacks;
 
+    private frameBuffer: Float32Array;
+    private committedTranscript: string = "";
+    private useVAD: boolean;
+    private mediaStream: MediaStream;
+    
+    protected audioContext: AudioContext;
+    public isActive: boolean = false;
+
+    /**
+     * Creates a transcriber for transcribing a MediaStream from any source. After creating the {@link Transcriber}, you must invoke
+     * {@link Transcriber.attachStream} to provide a MediaStream that you want to transcribe.
+     *
+     * @param modelURL The URL that the underlying {@link MoonshineModel} weights should be loaded from,
+     * relative to {@link Settings.BASE_ASSET_PATH.MOONSHINE}.
+     *
+     * @param callbacks A set of {@link TranscriberCallbacks} used to trigger behavior at different steps of the
+     * transcription lifecycle. For transcription-only use cases, you should define the {@link TranscriberCallbacks} yourself;
+     * when using the transcriber for voice control, you should create a {@link VoiceController} and pass it in.
+     *
+     * @param useVAD A boolean specifying whether or not to use Voice Activity Detection (VAD) on audio processed by the transcriber.
+     * When set to `true`, the transcriber will only process speech at the end of each chunk of voice activity.
+     *
+     * @example
+     * This basic example demonstrates the use of the transcriber with custom callbacks:
+     *
+     * ``` ts
+     * import Transcriber from "@usefulsensors/moonshine-js";
+     *
+     * var transcriber = new Transcriber(
+     *      "model/tiny",
+     *      {
+     *          onModelLoadStarted() {
+     *              console.log("onModelLoadStarted()");
+     *          },
+     *          onTranscribeStarted() {
+     *              console.log("onTranscribeStarted()");
+     *          },
+     *          onTranscribeStopped() {
+     *              console.log("onTranscribeStopped()");
+     *          },
+     *          onTranscriptionUpdated(text: string | undefined) {
+     *              console.log(
+     *                  "onTranscriptionUpdated(" + text + ")"
+     *              );
+     *          },
+     *          onTranscriptionCommitted(text: string | undefined) {
+     *              console.log(
+     *                  "onTranscriptionCommitted(" + text + ")"
+     *              );
+     *          },
+     *      }
+     * );
+     *
+     * // Get a MediaStream from somewhere (user mic, active tab, an <audio> element, WebRTC source, etc.)
+     * ...
+     *
+     * transcriber.attachStream(stream);
+     * transcriber.start();
+     * ```
+     */
     public constructor(
         modelURL: string,
-        callbacks: Partial<TranscriberCallbacks> = {}
+        callbacks: Partial<TranscriberCallbacks> = {},
+        useVAD: boolean = true
     ) {
         this.callbacks = { ...defaultTranscriberCallbacks, ...callbacks };
         Transcriber.model = new MoonshineModel(modelURL);
+        this.useVAD = useVAD;
     }
 
-    abstract start(): void;
-    abstract stop(): void;
-    async loadModel() {
+    async load() {
         this.callbacks.onModelLoadStarted();
         await Transcriber.model.loadModel();
+
+        this.audioContext = new AudioContext();
+
+        // streaming parameters
+        const frameSize = 512; // as specified by silero v5
+        const interval = 16; // inference interval
+        const maxFrames = interval * 6; // maximum before clearing buffer
+        this.frameBuffer = new Float32Array(maxFrames * frameSize);
+        var frameCount = 0;
+        var isTalking = false;
+
+        // perform continuous inferences during speech if useVAD is false
+        const onFrameProcessed = this.useVAD
+            ? (probs, frame) => {}
+            : (probs, frame) => {
+                  if (isTalking) {
+                      if (frameCount <= maxFrames) {
+                          this.frameBuffer.set(frame, frameCount * frameSize);
+                          frameCount += 1;
+                      }
+                      if (frameCount > 0 && frameCount % interval == 0) {
+                          // inference
+                          Transcriber.model
+                              ?.generate(
+                                  this.frameBuffer.subarray(
+                                      0,
+                                      frameCount * frameSize
+                                  )
+                              )
+                              .then((text) => {
+                                  this.callbacks.onTranscriptionUpdated(text);
+                              });
+                      }
+                      if (frameCount >= maxFrames) {
+                          // clear buffer (leave some overhang?)
+                          this.frameBuffer = new Float32Array(
+                              maxFrames * frameSize
+                          );
+                          frameCount = 0;
+                      }
+                  }
+              };
+
+        this.vadModel = await AudioNodeVAD.new(this.audioContext, {
+            onFrameProcessed: onFrameProcessed,
+            onVADMisfire: () => {
+                Log.log("Transcriber.onVADMisfire()");
+            },
+            onSpeechStart: () => {
+                Log.log("Transcriber.onSpeechStart()");
+                this.callbacks.onSpeechStart();
+                if (!this.useVAD) isTalking = true; // flag is only used when streaming
+            },
+            onSpeechEnd: (floatArray) => {
+                Log.log("Transcriber.onSpeechEnd()");
+                this.callbacks.onSpeechEnd();
+                if (!this.useVAD) {
+                    // flag and buffer only used in streaming mode
+                    isTalking = false;
+                    this.frameBuffer = new Float32Array(maxFrames * frameSize);
+                    frameCount = 0;
+                }
+                Transcriber.model?.generate(floatArray).then((text) => {
+                    this.callbacks.onTranscriptionUpdated(text);
+                    this.callbacks.onTranscriptionCommitted(
+                        this.committedTranscript
+                    );
+                    this.committedTranscript += " " + text;
+                });
+            },
+            model: "v5",
+            baseAssetPath: Settings.BASE_ASSET_PATH.SILERO_VAD,
+            onnxWASMBasePath: Settings.BASE_ASSET_PATH.ONNX_RUNTIME,
+        });
+        this.attachStream(this.mediaStream);
         this.callbacks.onModelLoaded();
+    }
+
+    /**
+     * Attaches a MediaStream to this {@link Transcriber} for transcription. A MediaStream must be attached before
+     * starting transcription.
+     *
+     * @param stream A MediaStream to transcribe
+     */
+    public attachStream(stream: MediaStream) {
+        if (this.vadModel) {
+            var sourceNode = new MediaStreamAudioSourceNode(this.audioContext, {
+                mediaStream: stream,
+            });
+            this.vadModel.receive(sourceNode);
+            Log.log(
+                "Transcriber.attachStream(): VAD set to receive source node from stream."
+            );
+        } else {
+            // save stream to attach later, after loading
+            this.mediaStream = stream;
+        }
+    }
+
+    /**
+     * Detaches the MediaStream used for transcription.
+     * @todo
+     */
+    public detachStream() {
+        // TODO
+    }
+
+    /**
+     * Returns the most recent AudioBuffer that was input to the underlying model for text generation. This is useful in cases where
+     * we want to double-check the audio being input to the model while debugging.
+     *
+     * @returns An AudioBuffer
+     */
+    public getAudioBuffer(): AudioBuffer {
+        const numChannels = 1;
+        const audioBuffer = this.audioContext.createBuffer(
+            numChannels,
+            this.frameBuffer.length,
+            16000
+        );
+        audioBuffer.getChannelData(0).set(this.frameBuffer);
+        return audioBuffer;
+    }
+
+    /**
+     * Starts transcription.
+     *
+     * if `useVAD === true`: generate an updated transcription at the end of every chunk of detected voice activity.
+     * else if `useVAD === false`: generate an updated transcription every {@link Settings.FRAME_SIZE} milliseconds.
+     *
+     * Transcription will stop when {@link stop} is called, or when {@link Settings.MAX_RECORD_MS} is passed (whichever comes first).
+     *
+     * Note that the {@link Transcriber} must have a MediaStream attached via {@link Transcriber.attachStream} before
+     * starting transcription.
+     */
+    async start() {
+        if (!this.isActive) {
+            this.isActive = true;
+            this.committedTranscript = "";
+
+            // load model if not loaded
+            if (!Transcriber.model.isLoaded() || this.vadModel === undefined) {
+                await this.load();
+            }
+
+            this.callbacks.onTranscribeStarted();
+            this.vadModel.start();
+        }
+    }
+
+    /**
+     * Stops transcription.
+     */
+    stop() {
+        this.isActive = false;
+        this.callbacks.onTranscribeStopped();
+        if (this.vadModel) {
+            this.vadModel.pause();
+        }
     }
 }
 
-export { TranscriberCallbacks, Transcriber };
+export { Transcriber, TranscriberCallbacks };
