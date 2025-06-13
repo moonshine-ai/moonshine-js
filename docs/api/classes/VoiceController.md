@@ -3,7 +3,7 @@ undefined
 
 Defined in: [voiceController.ts:12](https://github.com/usefulsensors/moonshine-js/blob/main/src/voiceController.ts#L12)
 
-An interface for invoking voice-controlled actions on a page using speech transcribed by a Transcriber.
+An interface for invoking voice-controlled actions on a page using speech transcribed by a [Transcriber](/docs/api/classes/transcriber).
 
 ## Extended by
 

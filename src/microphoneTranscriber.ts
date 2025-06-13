@@ -1,12 +1,11 @@
 import { Settings } from "./constants";
-import { TranscriberCallbacks } from "./transcriber";
-import StreamTranscriber from "./streamTranscriber";
+import { Transcriber, TranscriberCallbacks } from "./transcriber";
 import { MoonshineError } from "./error";
 
 /**
  * Accesses the user's microphone and transcribes their speech.
  */
-class MicrophoneTranscriber extends StreamTranscriber {
+class MicrophoneTranscriber extends Transcriber {
 
     /**
      * Creates a transcriber for transcribing an audio stream from a mic.

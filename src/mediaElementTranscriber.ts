@@ -1,10 +1,9 @@
-import StreamTranscriber from "./streamTranscriber";
-import { TranscriberCallbacks } from "./transcriber";
+import { TranscriberCallbacks, Transcriber } from "./transcriber";
 
 /**
  * Transcribes the output of an `<audio>` or `<video>` HTML element.
  */
-class MediaElementTranscriber extends StreamTranscriber {
+class MediaElementTranscriber extends Transcriber {
     private isAttached: boolean = false;
     private mediaElement: HTMLMediaElement;
 
@@ -37,7 +36,7 @@ class MediaElementTranscriber extends StreamTranscriber {
             const source = this.audioContext.createMediaElementSource(
                 this.mediaElement
             );
-            // destination: a new MediaStream to pass to the parent StreamTranscriber
+            // destination: a new MediaStream to pass to the parent Transcriber
             const destination =
                 this.audioContext.createMediaStreamDestination();
             const stream = destination.stream;
