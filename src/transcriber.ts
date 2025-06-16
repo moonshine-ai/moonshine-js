@@ -277,17 +277,22 @@ class Transcriber {
      * @param stream A MediaStream to transcribe
      */
     public attachStream(stream: MediaStream) {
-        if (this.vadModel) {
-            var sourceNode = new MediaStreamAudioSourceNode(this.audioContext, {
-                mediaStream: stream,
-            });
-            this.vadModel.receive(sourceNode);
-            Log.log(
-                "Transcriber.attachStream(): VAD set to receive source node from stream."
-            );
-        } else {
-            // save stream to attach later, after loading
-            this.mediaStream = stream;
+        if (stream) {
+            if (this.vadModel) {
+                var sourceNode = new MediaStreamAudioSourceNode(
+                    this.audioContext,
+                    {
+                        mediaStream: stream,
+                    }
+                );
+                this.vadModel.receive(sourceNode);
+                Log.log(
+                    "Transcriber.attachStream(): VAD set to receive source node from stream."
+                );
+            } else {
+                // save stream to attach later, after loading
+                this.mediaStream = stream;
+            }
         }
     }
 
