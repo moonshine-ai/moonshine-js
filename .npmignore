@@ -6,3 +6,7 @@ dist/model/base/quantized_4bit
 dist/model/tiny/float
 dist/model/tiny/quantized_4bit
 dist/model/base-es-non-commercial/float
+downloader.js
+rollup.config.mjs
+tsconfig.json
+typedoc.json
