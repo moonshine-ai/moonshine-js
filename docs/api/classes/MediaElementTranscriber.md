@@ -44,9 +44,9 @@ Defined in: [mediaElementTranscriber.ts:17](https://github.com/usefulsensors/moo
 
 | Property | Modifier | Type | Default value | Inherited from | Defined in |
 | ------ | ------ | ------ | ------ | ------ | ------ |
-| <a id="audiocontext"></a> `audioContext` | `protected` | `AudioContext` | `undefined` | [`Transcriber`](/docs/api/classes/transcriber).[`audioContext`](/docs/api/classes/transcriber#audiocontext) | [transcriber.ts:107](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L107) |
+| <a id="audiocontext"></a> `audioContext` | `protected` | `AudioContext` | `undefined` | [`Transcriber`](/docs/api/classes/transcriber).[`audioContext`](/docs/api/classes/transcriber#audiocontext) | [transcriber.ts:105](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L105) |
 | <a id="callbacks-1"></a> `callbacks` | `public` | [`TranscriberCallbacks`](/docs/api/interfaces/transcribercallbacks) | `undefined` | [`Transcriber`](/docs/api/classes/transcriber).[`callbacks`](/docs/api/classes/transcriber#callbacks-1) | [transcriber.ts:99](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L99) |
-| <a id="isactive"></a> `isActive` | `public` | `boolean` | `false` | [`Transcriber`](/docs/api/classes/transcriber).[`isActive`](/docs/api/classes/transcriber#isactive) | [transcriber.ts:108](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L108) |
+| <a id="isactive"></a> `isActive` | `public` | `boolean` | `false` | [`Transcriber`](/docs/api/classes/transcriber).[`isActive`](/docs/api/classes/transcriber#isactive) | [transcriber.ts:106](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L106) |
 | <a id="model"></a> `model` | `static` | [`MoonshineModel`](/docs/api/classes/moonshinemodel) | `undefined` | [`Transcriber`](/docs/api/classes/transcriber).[`model`](/docs/api/classes/transcriber#model) | [transcriber.ts:98](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L98) |
 
 ## Methods
@@ -57,7 +57,7 @@ Defined in: [mediaElementTranscriber.ts:17](https://github.com/usefulsensors/moo
 attachStream(stream): void
 ```
 
-Defined in: [transcriber.ts:281](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L281)
+Defined in: [transcriber.ts:279](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L279)
 
 Attaches a MediaStream to this [Transcriber](/docs/api/classes/transcriber) for transcription. A MediaStream must be attached before
 starting transcription.
@@ -84,7 +84,7 @@ starting transcription.
 detachStream(): void
 ```
 
-Defined in: [transcriber.ts:300](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L300)
+Defined in: [transcriber.ts:303](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L303)
 
 Detaches the MediaStream used for transcription.
 
@@ -106,7 +106,7 @@ Detaches the MediaStream used for transcription.
 getAudioBuffer(): AudioBuffer
 ```
 
-Defined in: [transcriber.ts:310](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L310)
+Defined in: [transcriber.ts:313](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L313)
 
 Returns the most recent AudioBuffer that was input to the underlying model for text generation. This is useful in cases where
 we want to double-check the audio being input to the model while debugging.
@@ -129,7 +129,7 @@ An AudioBuffer
 load(): Promise<void>
 ```
 
-Defined in: [transcriber.ts:173](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L173)
+Defined in: [transcriber.ts:171](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L171)
 
 #### Returns
 
@@ -175,7 +175,7 @@ starting transcription.
 stop(): void
 ```
 
-Defined in: [transcriber.ts:349](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L349)
+Defined in: [transcriber.ts:352](https://github.com/usefulsensors/moonshine-js/blob/main/src/transcriber.ts#L352)
 
 Stops transcription.
 
