@@ -2,8 +2,8 @@
 title: "Classes"
 ---
 - [IntentClassifier](/docs/api/classes/intentclassifier)
-- [MediaElementTranscriber](/docs/api/classes/mediaelementtranscriber)
 - [KeywordSpotter](/docs/api/classes/keywordspotter)
+- [MediaElementTranscriber](/docs/api/classes/mediaelementtranscriber)
 - [MicrophoneTranscriber](/docs/api/classes/microphonetranscriber)
 - [MoonshineModel](/docs/api/classes/moonshinemodel)
 - [MoonshineSpeechRecognition](/docs/api/classes/moonshinespeechrecognition)
