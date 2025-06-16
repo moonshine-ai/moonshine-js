@@ -11,26 +11,25 @@ import Log from "./log";
  *
  * @property onError(error: MoonshineError) - called when an error occurs.
  *
- * @property onModelLoadStarted() - called when the {@link MoonshineModel} begins to load (or download, if hosted elsewhere)
+ * @property onModelLoadStarted() - called when the {@link MoonshineModel} and VAD begins to load (or download, if hosted elsewhere)
  *
- * @property onModelLoaded() - called when the {@link MoonshineModel} is loaded. This means the Transcriber is now ready to use.
+ * @property onModelLoaded() - called when the {@link MoonshineModel} and VAD are loaded. This means the Transcriber is now ready to use.
  *
  * @property onTranscribeStarted() - called once when transcription starts
  *
  * @property onTranscribeStopped() - called once when transcription stops
  *
- * @property onTranscriptionUpdated(text: string | undefined) - called every {@link Settings.FRAME_SIZE} milliseconds while
- * transcription is active. Use this callback when you don't need long-running transcription - you only care about
- * the most-recent transcription output. Note that the transcription output may be empty in cases where no speech was detected.
+ * @property onTranscriptionUpdated(text: string) - called every {@link Settings.STREAM_UPDATE_INTERVAL} milliseconds while
+ * transcription is active if useVAD == false. Use this callback when you don't need long-running transcription - you only care about
+ * the most-recent transcription output. Note that the transcription output may be empty in some cases.
  *
- * @property onTranscriptionCommitted(text: string | undefined) - called every {@link Settings.FRAME_SIZE} milliseconds while
- * transcription is active, and every {@link Settings.MAX_SPEECH_SECS} when the transcription is "committed",
- * i.e., the underlying audio buffer is emptied and the model begins inferences on a fresh buffer. Use this callback
- * for a long-running transcription of audio.
+ * @property onTranscriptionCommitted(text: string) - called every {@link Settings.STREAM_COMMIT_INTERVAL} milliseconds while
+ * transcription is active and useVAD == false, or every {@link Settings.VAD_COMMIT_INTERVAL} when useVAD == true. Use this callback
+ * for a long-running transcription of audio, like captioning a video or microphone stream.
  *
- * @property onSpeechStart() - called when the VAD model detects the start of speech if `useVAD === true`.
+ * @property onSpeechStart() - called when the VAD model detects the start of speech
  *
- * @property onSpeechEnd() - called when the VAD model detects the end of speech if `useVAD === true`.
+ * @property onSpeechEnd() - called when the VAD model detects the end of speech
  *
  * @interface
  */
@@ -47,9 +46,9 @@ interface TranscriberCallbacks {
 
     onTranscribeStopped: () => any;
 
-    onTranscriptionUpdated: (text: string | undefined) => any;
+    onTranscriptionUpdated: (text: string) => any;
 
-    onTranscriptionCommitted: (text: string | undefined) => any;
+    onTranscriptionCommitted: (text: string) => any;
 
     onSpeechStart: () => any;
 
@@ -100,10 +99,9 @@ class Transcriber {
     callbacks: TranscriberCallbacks;
 
     private frameBuffer: Float32Array;
-    private committedTranscript: string = "";
     private useVAD: boolean;
     private mediaStream: MediaStream;
-    
+
     protected audioContext: AudioContext;
     public isActive: boolean = false;
 
@@ -167,53 +165,76 @@ class Transcriber {
         this.callbacks = { ...defaultTranscriberCallbacks, ...callbacks };
         Transcriber.model = new MoonshineModel(modelURL);
         this.useVAD = useVAD;
+        this.audioContext = new AudioContext();
     }
 
     async load() {
         this.callbacks.onModelLoadStarted();
         await Transcriber.model.loadModel();
 
-        this.audioContext = new AudioContext();
+        // behavior
+        // useVAD:  commit every 30s or onSpeechEnd
+        // !useVAD: update every updateInterval frames; commit on maxFrames
 
-        // streaming parameters
-        const frameSize = 512; // as specified by silero v5
-        const interval = 16; // inference interval
-        const maxFrames = interval * 6; // maximum before clearing buffer
-        this.frameBuffer = new Float32Array(maxFrames * frameSize);
+        // maximum before committing and clearing buffer
+        const commitInterval = this.useVAD
+            ? Settings.VAD_COMMIT_INTERVAL
+            : Settings.STREAM_COMMIT_INTERVAL;
+
+        this.flushBuffer();
+
         var frameCount = 0;
         var isTalking = false;
 
-        // perform continuous inferences during speech if useVAD is false
-        const onFrameProcessed = this.useVAD
-            ? (probs, frame) => {}
-            : (probs, frame) => {
-                  if (isTalking) {
-                      if (frameCount <= maxFrames) {
-                          this.frameBuffer.set(frame, frameCount * frameSize);
-                          frameCount += 1;
-                      }
-                      if (frameCount > 0 && frameCount % interval == 0) {
-                          // inference
-                          Transcriber.model
-                              ?.generate(
-                                  this.frameBuffer.subarray(
-                                      0,
-                                      frameCount * frameSize
-                                  )
-                              )
-                              .then((text) => {
-                                  this.callbacks.onTranscriptionUpdated(text);
-                              });
-                      }
-                      if (frameCount >= maxFrames) {
-                          // clear buffer (leave some overhang?)
-                          this.frameBuffer = new Float32Array(
-                              maxFrames * frameSize
-                          );
-                          frameCount = 0;
-                      }
-                  }
-              };
+        const onFrameProcessed = (probs, frame) => {
+            if (isTalking) {
+                if (frameCount <= commitInterval) {
+                    this.frameBuffer.set(
+                        frame,
+                        frameCount * Settings.FRAME_SIZE
+                    );
+                    frameCount += 1;
+                }
+                if (frameCount > 0) {
+                    // update
+                    if (
+                        !this.useVAD &&
+                        frameCount < commitInterval &&
+                        frameCount % Settings.STREAM_UPDATE_INTERVAL == 0
+                    ) {
+                        Transcriber.model
+                            ?.generate(
+                                this.frameBuffer.subarray(
+                                    0,
+                                    frameCount * Settings.FRAME_SIZE
+                                )
+                            )
+                            .then((text) => {
+                                this.callbacks.onTranscriptionUpdated(text);
+                            });
+                    }
+                    // commit
+                    else if (frameCount == commitInterval) {
+                        // in this case we need to copy the buffer so that it doesn't get cleared before the inference happens
+                        var tmpBuffer = this.frameBuffer.slice(
+                            0,
+                            frameCount * Settings.FRAME_SIZE
+                        );
+                        Transcriber.model?.generate(tmpBuffer).then((text) => {
+                            // buffer is about to be cleared; commit the transcript
+                            if (text) {
+                                this.callbacks.onTranscriptionCommitted(text);
+                            }
+                        });
+                    }
+                }
+                if (frameCount == commitInterval) {
+                    // clear buffer (leave some overhang?)
+                    this.flushBuffer();
+                    frameCount = 0;
+                }
+            }
+        };
 
         this.vadModel = await AudioNodeVAD.new(this.audioContext, {
             onFrameProcessed: onFrameProcessed,
@@ -223,24 +244,23 @@ class Transcriber {
             onSpeechStart: () => {
                 Log.log("Transcriber.onSpeechStart()");
                 this.callbacks.onSpeechStart();
-                if (!this.useVAD) isTalking = true; // flag is only used when streaming
+                isTalking = true;
             },
             onSpeechEnd: (floatArray) => {
                 Log.log("Transcriber.onSpeechEnd()");
                 this.callbacks.onSpeechEnd();
-                if (!this.useVAD) {
-                    // flag and buffer only used in streaming mode
-                    isTalking = false;
-                    this.frameBuffer = new Float32Array(maxFrames * frameSize);
-                    frameCount = 0;
-                }
-                Transcriber.model?.generate(floatArray).then((text) => {
-                    this.callbacks.onTranscriptionUpdated(text);
-                    this.callbacks.onTranscriptionCommitted(
-                        this.committedTranscript
-                    );
-                    this.committedTranscript += " " + text;
+                var tmpBuffer = this.frameBuffer.slice(
+                    0,
+                    frameCount * Settings.FRAME_SIZE
+                );
+                Transcriber.model?.generate(tmpBuffer).then((text) => {
+                    if (text) {
+                        this.callbacks.onTranscriptionCommitted(text);
+                    }
                 });
+                isTalking = false;
+                this.flushBuffer();
+                frameCount = 0;
             },
             model: "v5",
             baseAssetPath: Settings.BASE_ASSET_PATH.SILERO_VAD,
@@ -300,9 +320,9 @@ class Transcriber {
      * Starts transcription.
      *
      * if `useVAD === true`: generate an updated transcription at the end of every chunk of detected voice activity.
-     * else if `useVAD === false`: generate an updated transcription every {@link Settings.FRAME_SIZE} milliseconds.
+     * else if `useVAD === false`: generate an updated transcription every {@link Settings.STREAM_UPDATE_INTERVAL}.
      *
-     * Transcription will stop when {@link stop} is called, or when {@link Settings.MAX_RECORD_MS} is passed (whichever comes first).
+     * Transcription will stop when {@link stop} is called.
      *
      * Note that the {@link Transcriber} must have a MediaStream attached via {@link Transcriber.attachStream} before
      * starting transcription.
@@ -310,7 +330,6 @@ class Transcriber {
     async start() {
         if (!this.isActive) {
             this.isActive = true;
-            this.committedTranscript = "";
 
             // load model if not loaded
             if (!Transcriber.model.isLoaded() || this.vadModel === undefined) {
@@ -331,6 +350,14 @@ class Transcriber {
         if (this.vadModel) {
             this.vadModel.pause();
         }
+    }
+
+    private flushBuffer() {
+        this.frameBuffer = new Float32Array(
+            (this.useVAD
+                ? Settings.VAD_COMMIT_INTERVAL
+                : Settings.STREAM_COMMIT_INTERVAL) * Settings.FRAME_SIZE
+        );
     }
 }
 

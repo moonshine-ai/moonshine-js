@@ -43,7 +43,7 @@ benchmarkExecutionEnvironment(sampleSize): Promise<number>
 Defined in: [model.ts:100](https://github.com/usefulsensors/moonshine-js/blob/main/src/model.ts#L100)
 
 Tests the inference latency of the current environment. This is useful for determining the appropriate
-[Settings.FRAME\_SIZE](/docs/api/variables/settings#frame_size) and [Settings.MAX\_SPEECH\_SECS](/docs/api/variables/settings#max_speech_secs) for a given execution environment.
+[Settings.FRAME\_SIZE](/docs/api/variables/settings#frame_size) and Settings.MAX\_SPEECH\_SECS for a given execution environment.
 
 #### Parameters
 
