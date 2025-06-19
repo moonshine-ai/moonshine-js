@@ -1,5 +1,6 @@
 import { Settings } from "./constants";
 import MoonshineModel from "./model";
+import MoonshineError from "./error";
 import { AudioNodeVAD } from "@ricky0123/vad-web";
 import Log from "./log";
 import { MoonshineError } from "./error";
@@ -174,7 +175,12 @@ class Transcriber {
 
     async load() {
         this.callbacks.onModelLoadStarted();
-        await Transcriber.model.loadModel();
+        try {
+            await Transcriber.model.loadModel();
+        } catch (err) {
+            this.callbacks.onError(MoonshineError.PlatformUnsupported);
+            throw err;
+        }
 
         // behavior
         // useVAD:  commit every 30s or onSpeechEnd
