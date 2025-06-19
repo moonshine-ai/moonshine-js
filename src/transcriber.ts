@@ -3,7 +3,6 @@ import MoonshineModel from "./model";
 import MoonshineError from "./error";
 import { AudioNodeVAD } from "@ricky0123/vad-web";
 import Log from "./log";
-import { MoonshineError } from "./error";
 
 /**
  * Callbacks are invoked at different phases of the lifecycle as audio is transcribed. You can control the behavior of the application
