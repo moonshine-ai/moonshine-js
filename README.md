@@ -104,6 +104,8 @@ start a static file server hosting the example.
 ## Credit
 
 MoonshineJS is developed and maintained by [Moonshine AI](https://moonshine.ai).
+Our thanks go to [@Ricky0123](https://github.com/ricky0123) for [his excellent
+voice activity detector library](https://github.com/ricky0123/vad).
 
 ## License
 
