@@ -1,7 +1,7 @@
 undefined
 # Class: MoonshineModel
 
-Defined in: [model.ts:15](https://github.com/usefulsensors/moonshine-js/blob/main/src/model.ts#L15)
+Defined in: [model.ts:15](https://github.com/moonshine-ai/moonshine-js/blob/main/src/model.ts#L15)
 
 Implements speech-to-text inferences with Moonshine models.
 
@@ -13,7 +13,7 @@ Implements speech-to-text inferences with Moonshine models.
 new MoonshineModel(modelURL, precision): MoonshineModel
 ```
 
-Defined in: [model.ts:33](https://github.com/usefulsensors/moonshine-js/blob/main/src/model.ts#L33)
+Defined in: [model.ts:33](https://github.com/moonshine-ai/moonshine-js/blob/main/src/model.ts#L33)
 
 Create (but do not load) a new MoonshineModel for inference.
 
@@ -40,7 +40,7 @@ Creating a MoonshineModel has the side effect of setting the path to the `onnxru
 benchmarkExecutionEnvironment(sampleSize): Promise<number>
 ```
 
-Defined in: [model.ts:100](https://github.com/usefulsensors/moonshine-js/blob/main/src/model.ts#L100)
+Defined in: [model.ts:100](https://github.com/moonshine-ai/moonshine-js/blob/main/src/model.ts#L100)
 
 Tests the inference latency of the current environment. This is useful for determining the appropriate
 [Settings.FRAME\_SIZE](/docs/api/variables/settings#frame_size) and Settings.MAX\_SPEECH\_SECS for a given execution environment.
@@ -70,7 +70,7 @@ for transcription immediately after benchmarking.
 generate(audio): Promise<string>
 ```
 
-Defined in: [model.ts:158](https://github.com/usefulsensors/moonshine-js/blob/main/src/model.ts#L158)
+Defined in: [model.ts:158](https://github.com/moonshine-ai/moonshine-js/blob/main/src/model.ts#L158)
 
 Generate a transcription of the passed audio.
 
@@ -94,7 +94,7 @@ A Promise that resolves with the generated transcription.
 getLatency(): number
 ```
 
-Defined in: [model.ts:120](https://github.com/usefulsensors/moonshine-js/blob/main/src/model.ts#L120)
+Defined in: [model.ts:120](https://github.com/moonshine-ai/moonshine-js/blob/main/src/model.ts#L120)
 
 Returns the latency (in ms) of the most recent call to [MoonshineModel.generate](/docs/api/classes/moonshinemodel#generate)
 
@@ -112,7 +112,7 @@ A latency reading (in ms)
 isLoaded(): boolean
 ```
 
-Defined in: [model.ts:149](https://github.com/usefulsensors/moonshine-js/blob/main/src/model.ts#L149)
+Defined in: [model.ts:149](https://github.com/moonshine-ai/moonshine-js/blob/main/src/model.ts#L149)
 
 Returns whether or not the model weights have been loaded.
 
@@ -130,7 +130,7 @@ true if the model is loaded, false if not.
 loadModel(): Promise<void>
 ```
 
-Defined in: [model.ts:127](https://github.com/usefulsensors/moonshine-js/blob/main/src/model.ts#L127)
+Defined in: [model.ts:127](https://github.com/moonshine-ai/moonshine-js/blob/main/src/model.ts#L127)
 
 Load the model weights.
 

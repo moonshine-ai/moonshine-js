@@ -7,7 +7,8 @@
  */
 export const MoonshineError = {
     PermissionDenied: "Permission to the requested resource was denied.",
-    PlatformUnsupported: "This platform (e.g., user browser or device) is not supported."
+    PlatformUnsupported: "This platform (e.g., user browser or device) is not supported.",
+    NotReceivingAudioInput: "The audio system is not receiving input from the source."
 }
 
 export default MoonshineError;

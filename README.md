@@ -88,9 +88,22 @@ transcriber.addEventListener("result", (e) => {
 });
 ```
 
+## Building
+
+To build the `dist/moonshine.min.js` file from source, first run `npm install`
+and then `npm run build`. You'll need to have the [Moonshine fork of
+@ricky0123/vad](https://github.com/moonshine-ai/vad-moonshine) in the parent
+folder of this repo.
+
+To test that your built version is running correctly, `cd` into
+`examples/quickstart`, and in `index.js` comment out the import of moonshine
+from npm at the top of the file, then uncomment the local file import. Then run
+`npm import` to install [Vite](https://vite.dev/) followed by `npx vite` to
+start a static file server hosting the example.
+
 ## Credit
 
-MoonshineJS is developed and maintained by [Useful Sensors](https://usefulsensors.com).
+MoonshineJS is developed and maintained by [Moonshine AI](https://moonshine.ai).
 
 ## License
 
