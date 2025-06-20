@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+    <head>
+        <title>MoonshineJS Dashboard</title>
+    </head>
+    <script type="module" src="https://unpkg.com/chart.js@4.2.1/dist/chart.umd.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <body>
+        <div>
+            <div>
+                <h1>
+                    MoonshineJS Dashboard
+                </h1>
+                <p>
+                    This dashboard can be used to tweak and understand the effects of different parameters on transcription generation. 
+                </p>
+                <p>
+                    <h2>
+                        Status
+                    </h2>
+                    State: <span id="state">Waiting.</span>
+                    <br>
+                    <span id="history"></span>
+                </p>
+            </div>
+            <div>
+                <h2>MicrophoneTranscriber</h2>
+                <button id="button">
+                    Start
+                </button>
+            </div>
+            <div>
+                <h2>MediaElementTranscriber</h2>
+                <video controls id="video">
+                    <source src="/assets/eno.mp4" type="video/mp4"></source>
+                </video>
+                <div style="width: 50%;">
+                    <canvas id="chart">
+                    </canvas>
+                </div>
+            </div>
+        </div>
+        <script type="module" src="./index.js"></script>
+    </body>
+</html>

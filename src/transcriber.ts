@@ -51,6 +51,8 @@ interface TranscriberCallbacks {
 
     onTranscriptionCommitted: (text: string) => any;
 
+    onFrame: (probs, frame, ema) => any;
+
     onSpeechStart: () => any;
 
     onSpeechEnd: () => any;
@@ -81,6 +83,7 @@ const defaultTranscriberCallbacks: TranscriberCallbacks = {
     onTranscriptionCommitted: function (text: string | undefined) {
         Log.log("Transcriber.onTranscriptionCommitted(" + text + ")");
     },
+    onFrame: function (probs, frame, ema) {},
     onSpeechStart: function () {
         Log.log("Transcriber.onSpeechStart()");
     },
@@ -88,6 +91,93 @@ const defaultTranscriberCallbacks: TranscriberCallbacks = {
         Log.log("Transcriber.onSpeechEnd()");
     },
 };
+
+class SpeechBuffer {
+    private buffer: Float32Array;
+    private frameCount: number;
+    public frameEMA: number;
+    private speechEMA: (value: number) => any;
+    private minCommitInterval: number;
+    private maxCommitInterval: number;
+
+    constructor(minCommitInterval: number, maxCommitInterval: number) {
+        this.minCommitInterval = minCommitInterval;
+        this.maxCommitInterval = maxCommitInterval;
+        this.flush();
+    }
+
+    public flush(): void {
+        this.buffer = new Float32Array(
+            this.maxCommitInterval * Settings.FRAME_SIZE
+        );
+        this.speechEMA = this.ema(Settings.STREAM_COMMIT_EMA_PERIOD);
+        this.frameEMA = 0.0;
+        this.frameCount = 0;
+    }
+
+    public set(frame, p = undefined): void {
+        this.buffer.set(frame, this.frameCount * Settings.FRAME_SIZE);
+        if (p) this.updateEMA(p);
+        this.frameCount += 1;
+    }
+
+    public updateEMA(p): void {
+        this.frameEMA = this.speechEMA(p.isSpeech);
+    }
+
+    public subarray(): Float32Array {
+        return this.buffer.subarray(0, this.frameCount * Settings.FRAME_SIZE);
+    }
+
+    public copy(): Float32Array {
+        return this.buffer.slice(0, this.frameCount * Settings.FRAME_SIZE);
+    }
+
+    public hasFrames(): boolean {
+        return this.frameCount > 0;
+    }
+
+    public shouldSet(): boolean {
+        return this.frameCount <= this.maxCommitInterval;
+    }
+
+    public shouldUpdate(): boolean {
+        return (
+            this.frameCount < this.maxCommitInterval &&
+            this.frameCount % Settings.STREAM_UPDATE_INTERVAL === 0
+        );
+    }
+
+    public shouldCommit(): boolean {
+        if (
+            this.frameEMA <= 0.5 &&
+            this.frameCount >= this.minCommitInterval &&
+            this.frameCount < this.maxCommitInterval
+        ) {
+            Log.log(`Speech pause, frameCount: ${this.frameCount}`);
+        } else if (this.frameCount === this.maxCommitInterval) {
+            Log.log(`Forced commit, frameCount: ${this.frameCount}`);
+        }
+        return (
+            this.frameCount === this.maxCommitInterval ||
+            (this.frameEMA <= 0.5 && this.frameCount >= this.minCommitInterval)
+        );
+    }
+
+    private ema(period: number): (value: number) => number {
+        const k = 2 / (period + 1);
+        let emaPrev = null;
+
+        return function update(value: number): number {
+            if (emaPrev === null) {
+                emaPrev = value; // initialize with first value
+            } else {
+                emaPrev = value * k + emaPrev * (1 - k);
+            }
+            return emaPrev;
+        };
+    }
+}
 
 /**
  * Implements real-time transcription of an audio stream sourced from a WebAudio-compliant MediaStream object.
@@ -100,9 +190,9 @@ class Transcriber {
     private vadModel: AudioNodeVAD;
     callbacks: TranscriberCallbacks;
 
-    private frameBuffer: Float32Array;
     private useVAD: boolean;
     private mediaStream: MediaStream;
+    private speechBuffer: SpeechBuffer;
 
     protected audioContext: AudioContext;
     public isActive: boolean = false;
@@ -187,62 +277,55 @@ class Transcriber {
         // useVAD:  commit every 30s or onSpeechEnd
         // !useVAD: update every updateInterval frames; commit on maxFrames
 
-        // maximum before committing and clearing buffer
-        const commitInterval = this.useVAD
-            ? Settings.VAD_COMMIT_INTERVAL
-            : Settings.STREAM_COMMIT_INTERVAL;
-
-        this.flushBuffer();
-
-        var frameCount = 0;
+        this.speechBuffer = new SpeechBuffer(
+            Settings.STREAM_COMMIT_MIN_INTERVAL,
+            this.useVAD
+                ? Settings.VAD_COMMIT_INTERVAL
+                : Settings.STREAM_COMMIT_MAX_INTERVAL
+        );
         var isTalking = false;
 
-        const onFrameProcessed = (probs, frame) => {
+        const onFrameProcessed = (p, frame) => {
+            this.speechBuffer.updateEMA(p);
+            this.callbacks.onFrame(p, frame, this.speechBuffer.frameEMA);
             if (isTalking) {
-                if (frameCount <= commitInterval) {
-                    this.frameBuffer.set(
-                        frame,
-                        frameCount * Settings.FRAME_SIZE
-                    );
-                    frameCount += 1;
+                if (this.speechBuffer.shouldSet()) {
+                    this.speechBuffer.set(frame);
                 }
-                if (frameCount > 0) {
+                if (this.speechBuffer.hasFrames()) {
                     // update
-                    if (
-                        !this.useVAD &&
-                        frameCount < commitInterval &&
-                        frameCount % Settings.STREAM_UPDATE_INTERVAL == 0
-                    ) {
-                        this.sttModel
-                            ?.generate(
-                                this.frameBuffer.subarray(
-                                    0,
-                                    frameCount * Settings.FRAME_SIZE
-                                )
-                            )
+                    if (!this.useVAD && this.speechBuffer.shouldUpdate() && !this.speechBuffer.shouldCommit()) {
+                        Transcriber.model
+                            ?.generate(this.speechBuffer.subarray())
                             .then((text) => {
                                 this.callbacks.onTranscriptionUpdated(text);
+                            })
+                            .catch(() => {
+                                Log.error("Generation misfire.");
                             });
                     }
                     // commit
-                    else if (frameCount == commitInterval) {
+                    else if (this.speechBuffer.shouldCommit()) {
                         // in this case we need to copy the buffer so that it doesn't get cleared before the inference happens
-                        var tmpBuffer = this.frameBuffer.slice(
-                            0,
-                            frameCount * Settings.FRAME_SIZE
-                        );
-                        this.sttModel?.generate(tmpBuffer).then((text) => {
-                            // buffer is about to be cleared; commit the transcript
-                            if (text) {
-                                this.callbacks.onTranscriptionCommitted(text);
-                            }
-                        });
+                        var tmpBuffer = this.speechBuffer.copy();
+                        Transcriber.model
+                            ?.generate(tmpBuffer)
+                            .then((text) => {
+                                // buffer is about to be cleared; commit the transcript
+                                if (text) {
+                                    this.callbacks.onTranscriptionCommitted(
+                                        text
+                                    );
+                                }
+                            })
+                            .catch(() => {
+                                Log.error("Generation misfire.");
+                            });
                     }
                 }
-                if (frameCount == commitInterval) {
+                if (this.speechBuffer.shouldCommit()) {
                     // clear buffer (leave some overhang?)
-                    this.flushBuffer();
-                    frameCount = 0;
+                    this.speechBuffer.flush();
                 }
             }
         };
@@ -260,18 +343,14 @@ class Transcriber {
             onSpeechEnd: (floatArray) => {
                 Log.log("Transcriber.onSpeechEnd()");
                 this.callbacks.onSpeechEnd();
-                var tmpBuffer = this.frameBuffer.slice(
-                    0,
-                    frameCount * Settings.FRAME_SIZE
-                );
-                this.sttModel?.generate(tmpBuffer).then((text) => {
+                var tmpBuffer = this.speechBuffer.copy();
+                Transcriber.model?.generate(tmpBuffer).then((text) => {
                     if (text) {
                         this.callbacks.onTranscriptionCommitted(text);
                     }
                 });
+                this.speechBuffer.flush();
                 isTalking = false;
-                this.flushBuffer();
-                frameCount = 0;
             },
             model: "v5",
             baseAssetPath: Settings.BASE_ASSET_PATH.SILERO_VAD,
@@ -322,14 +401,15 @@ class Transcriber {
      * @returns An AudioBuffer
      */
     public getAudioBuffer(): AudioBuffer {
-        const numChannels = 1;
-        const audioBuffer = this.audioContext.createBuffer(
-            numChannels,
-            this.frameBuffer.length,
-            16000
-        );
-        audioBuffer.getChannelData(0).set(this.frameBuffer);
-        return audioBuffer;
+        // const numChannels = 1;
+        // const audioBuffer = this.audioContext.createBuffer(
+        //     numChannels,
+        //     this.bufferState.buffer.length,
+        //     16000
+        // );
+        // audioBuffer.getChannelData(0).set(this.bufferState.buffer);
+        // return audioBuffer;
+        return undefined;
     }
 
     /**
@@ -377,14 +457,6 @@ class Transcriber {
         if (this.vadModel) {
             this.vadModel.pause();
         }
-    }
-
-    private flushBuffer() {
-        this.frameBuffer = new Float32Array(
-            (this.useVAD
-                ? Settings.VAD_COMMIT_INTERVAL
-                : Settings.STREAM_COMMIT_INTERVAL) * Settings.FRAME_SIZE
-        );
     }
 }
 
