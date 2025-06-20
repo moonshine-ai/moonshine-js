@@ -11,14 +11,26 @@
                 <p>
                     This example demonstrates basic use of MoonshineJS for transcription.
                 </p>
+                <p>
+                    <h2>
+                        Status
+                    </h2>
+                    State: <span id="state">Waiting.</span>
+                    <br>
+                    <span id="history"></span>
+                </p>
             </div>
             <div>
-                <p>
-                    State: <span id="state">Waiting.</span>
-                </p>
+                <h2>MicrophoneTranscriber</h2>
                 <button id="button">
                     Start
                 </button>
+            </div>
+            <div>
+                <h2>MediaElementTranscriber</h2>
+                <video controls id="video">
+                    <source src="/assets/eno.mp4" type="video/mp4"></source>
+                </video>
             </div>
         </div>
         <script type="module" src="./index.js"></script>
