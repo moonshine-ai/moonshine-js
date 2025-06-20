@@ -14,6 +14,8 @@ const callbacks = {
     onError(e) {
         if (e == Moonshine.MoonshineError.PermissionDenied) {
             state.innerHTML = "Permission denied."
+        } else if (e == Moonshine.MoonshineError.NotReceivingAudioInput) {
+            state.innerHTML = "Not receiving audio input."
         }
     },
     onModelLoadStarted() {
@@ -46,21 +48,27 @@ const callbacks = {
     },
     onTranscribeStopped() {
         state.innerHTML = "Stopped."
-    }
+    },
 }
 
 var microphoneTranscriber = new Moonshine.MicrophoneTranscriber(
-    "model/tiny",
+    "model/base",
     callbacks,
     false
 );
+// Start loading the models before the user clicks the button. This
+// isn't strictly necessary since .start() will load the model if it's not
+// already loaded, but it's a good idea to do it in advance so that the user
+// doesn't have to wait for the model to load when they click the button.
+microphoneTranscriber.load();
 
 var videoTranscriber = new Moonshine.MediaElementTranscriber(
     document.getElementById("video"),
-    "model/tiny",
+    "model/base",
     callbacks,
     false // use streaming mode, rather than VAD chunks
 );
+videoTranscriber.load();
 
 button.addEventListener("click", () => {
     if (microphoneTranscriber.isActive) {

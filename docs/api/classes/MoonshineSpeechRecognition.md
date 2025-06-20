@@ -1,7 +1,7 @@
 undefined
 # Class: MoonshineSpeechRecognition
 
-Defined in: [webSpeechPolyfill.ts:94](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L94)
+Defined in: [webSpeechPolyfill.ts:94](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L94)
 
 ## Implements
 
@@ -15,7 +15,7 @@ Defined in: [webSpeechPolyfill.ts:94](https://github.com/usefulsensors/moonshine
 new MoonshineSpeechRecognition(modelURL): MoonshineSpeechRecognition
 ```
 
-Defined in: [webSpeechPolyfill.ts:97](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L97)
+Defined in: [webSpeechPolyfill.ts:97](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L97)
 
 #### Parameters
 
@@ -31,12 +31,12 @@ Defined in: [webSpeechPolyfill.ts:97](https://github.com/usefulsensors/moonshine
 
 | Property | Type | Default value | Defined in |
 | ------ | ------ | ------ | ------ |
-| <a id="continuous"></a> `continuous` | `boolean` | `undefined` | [webSpeechPolyfill.ts:101](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L101) |
-| <a id="grammars"></a> `grammars` | `SpeechGrammarList` | `undefined` | [webSpeechPolyfill.ts:102](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L102) |
-| <a id="interimresults"></a> `interimResults` | `boolean` | `undefined` | [webSpeechPolyfill.ts:103](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L103) |
-| <a id="lang"></a> `lang` | `string` | `undefined` | [webSpeechPolyfill.ts:104](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L104) |
-| <a id="maxalternatives"></a> `maxAlternatives` | `number` | `undefined` | [webSpeechPolyfill.ts:105](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L105) |
-| <a id="resultindex"></a> `resultIndex` | `number` | `0` | [webSpeechPolyfill.ts:156](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L156) |
+| <a id="continuous"></a> `continuous` | `boolean` | `undefined` | [webSpeechPolyfill.ts:101](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L101) |
+| <a id="grammars"></a> `grammars` | `SpeechGrammarList` | `undefined` | [webSpeechPolyfill.ts:102](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L102) |
+| <a id="interimresults"></a> `interimResults` | `boolean` | `undefined` | [webSpeechPolyfill.ts:103](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L103) |
+| <a id="lang"></a> `lang` | `string` | `undefined` | [webSpeechPolyfill.ts:104](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L104) |
+| <a id="maxalternatives"></a> `maxAlternatives` | `number` | `undefined` | [webSpeechPolyfill.ts:105](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L105) |
+| <a id="resultindex"></a> `resultIndex` | `number` | `0` | [webSpeechPolyfill.ts:156](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L156) |
 
 ## Accessors
 
@@ -48,7 +48,7 @@ Defined in: [webSpeechPolyfill.ts:97](https://github.com/usefulsensors/moonshine
 set onaudioend(handler): void
 ```
 
-Defined in: [webSpeechPolyfill.ts:136](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L136)
+Defined in: [webSpeechPolyfill.ts:136](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L136)
 
 ##### Parameters
 
@@ -70,7 +70,7 @@ Defined in: [webSpeechPolyfill.ts:136](https://github.com/usefulsensors/moonshin
 set onaudiostart(handler): void
 ```
 
-Defined in: [webSpeechPolyfill.ts:130](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L130)
+Defined in: [webSpeechPolyfill.ts:130](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L130)
 
 ##### Parameters
 
@@ -92,7 +92,7 @@ Defined in: [webSpeechPolyfill.ts:130](https://github.com/usefulsensors/moonshin
 set onend(handler): void
 ```
 
-Defined in: [webSpeechPolyfill.ts:142](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L142)
+Defined in: [webSpeechPolyfill.ts:142](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L142)
 
 ##### Parameters
 
@@ -114,7 +114,7 @@ Defined in: [webSpeechPolyfill.ts:142](https://github.com/usefulsensors/moonshin
 set onerror(handler): void
 ```
 
-Defined in: [webSpeechPolyfill.ts:148](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L148)
+Defined in: [webSpeechPolyfill.ts:148](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L148)
 
 ##### Parameters
 
@@ -136,7 +136,7 @@ Defined in: [webSpeechPolyfill.ts:148](https://github.com/usefulsensors/moonshin
 set onnomatch(handler): void
 ```
 
-Defined in: [webSpeechPolyfill.ts:152](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L152)
+Defined in: [webSpeechPolyfill.ts:152](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L152)
 
 ##### Parameters
 
@@ -158,7 +158,7 @@ Defined in: [webSpeechPolyfill.ts:152](https://github.com/usefulsensors/moonshin
 set onresult(handler): void
 ```
 
-Defined in: [webSpeechPolyfill.ts:158](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L158)
+Defined in: [webSpeechPolyfill.ts:158](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L158)
 
 ##### Parameters
 
@@ -180,7 +180,7 @@ Defined in: [webSpeechPolyfill.ts:158](https://github.com/usefulsensors/moonshin
 set onsoundend(handler): void
 ```
 
-Defined in: [webSpeechPolyfill.ts:199](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L199)
+Defined in: [webSpeechPolyfill.ts:199](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L199)
 
 ##### Parameters
 
@@ -202,7 +202,7 @@ Defined in: [webSpeechPolyfill.ts:199](https://github.com/usefulsensors/moonshin
 set onsoundstart(handler): void
 ```
 
-Defined in: [webSpeechPolyfill.ts:193](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L193)
+Defined in: [webSpeechPolyfill.ts:193](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L193)
 
 ##### Parameters
 
@@ -224,7 +224,7 @@ Defined in: [webSpeechPolyfill.ts:193](https://github.com/usefulsensors/moonshin
 set onspeechend(handler): void
 ```
 
-Defined in: [webSpeechPolyfill.ts:211](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L211)
+Defined in: [webSpeechPolyfill.ts:211](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L211)
 
 ##### Parameters
 
@@ -246,7 +246,7 @@ Defined in: [webSpeechPolyfill.ts:211](https://github.com/usefulsensors/moonshin
 set onspeechstart(handler): void
 ```
 
-Defined in: [webSpeechPolyfill.ts:205](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L205)
+Defined in: [webSpeechPolyfill.ts:205](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L205)
 
 ##### Parameters
 
@@ -268,7 +268,7 @@ Defined in: [webSpeechPolyfill.ts:205](https://github.com/usefulsensors/moonshin
 set onstart(handler): void
 ```
 
-Defined in: [webSpeechPolyfill.ts:217](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L217)
+Defined in: [webSpeechPolyfill.ts:217](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L217)
 
 ##### Parameters
 
@@ -288,7 +288,7 @@ Defined in: [webSpeechPolyfill.ts:217](https://github.com/usefulsensors/moonshin
 abort(): void
 ```
 
-Defined in: [webSpeechPolyfill.ts:126](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L126)
+Defined in: [webSpeechPolyfill.ts:126](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L126)
 
 #### Returns
 
@@ -302,7 +302,7 @@ Defined in: [webSpeechPolyfill.ts:126](https://github.com/usefulsensors/moonshin
 addEventListener(...args): void
 ```
 
-Defined in: [webSpeechPolyfill.ts:223](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L223)
+Defined in: [webSpeechPolyfill.ts:223](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L223)
 
 #### Parameters
 
@@ -322,7 +322,7 @@ Defined in: [webSpeechPolyfill.ts:223](https://github.com/usefulsensors/moonshin
 dispatchEvent(event): boolean
 ```
 
-Defined in: [webSpeechPolyfill.ts:114](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L114)
+Defined in: [webSpeechPolyfill.ts:114](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L114)
 
 #### Parameters
 
@@ -345,7 +345,7 @@ removeEventListener(
    options?): void
 ```
 
-Defined in: [webSpeechPolyfill.ts:107](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L107)
+Defined in: [webSpeechPolyfill.ts:107](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L107)
 
 #### Parameters
 
@@ -367,7 +367,7 @@ Defined in: [webSpeechPolyfill.ts:107](https://github.com/usefulsensors/moonshin
 start(): void
 ```
 
-Defined in: [webSpeechPolyfill.ts:118](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L118)
+Defined in: [webSpeechPolyfill.ts:118](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L118)
 
 #### Returns
 
@@ -381,7 +381,7 @@ Defined in: [webSpeechPolyfill.ts:118](https://github.com/usefulsensors/moonshin
 stop(): void
 ```
 
-Defined in: [webSpeechPolyfill.ts:122](https://github.com/usefulsensors/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L122)
+Defined in: [webSpeechPolyfill.ts:122](https://github.com/moonshine-ai/moonshine-js/blob/main/src/webSpeechPolyfill.ts#L122)
 
 #### Returns
 

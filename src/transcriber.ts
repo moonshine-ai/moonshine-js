@@ -2,6 +2,7 @@ import { Settings } from "./constants";
 import MoonshineModel from "./model";
 import { AudioNodeVAD } from "@ricky0123/vad-web";
 import Log from "./log";
+import { MoonshineError } from "./error";
 
 /**
  * Callbacks are invoked at different phases of the lifecycle as audio is transcribed. You can control the behavior of the application
@@ -104,6 +105,7 @@ class Transcriber {
 
     protected audioContext: AudioContext;
     public isActive: boolean = false;
+    private previousFrameCount: number = 0;
 
     /**
      * Creates a transcriber for transcribing a MediaStream from any source. After creating the {@link Transcriber}, you must invoke
@@ -166,6 +168,7 @@ class Transcriber {
         Transcriber.model = new MoonshineModel(modelURL);
         this.useVAD = useVAD;
         this.audioContext = new AudioContext();
+        this.previousFrameCount = 0;
     }
 
     async load() {
@@ -268,6 +271,21 @@ class Transcriber {
         });
         this.attachStream(this.mediaStream);
         this.callbacks.onModelLoaded();
+
+        // We've been seeing odd intermittent issues with Chrome where sometimes
+        // the audio worklet node isn't receiving audio frames at all. To detect
+        // this, we'll check the frame count every 2 seconds and see if it's
+        // increasing. If it's not, we'll log an error, and the client can
+        // decide what to do. We've been unable to consistently reproduce this
+        // unfortunately, and we've not seen this in Firefox or Safari.
+        setInterval(() => {
+            let currentFrameCount = this.vadModel.getRawAudioFramesReceivedCount();
+            let newFrameCount = currentFrameCount - this.previousFrameCount;
+            this.previousFrameCount = currentFrameCount;
+            if (newFrameCount <=  0) {
+                this.callbacks.onError(MoonshineError.NotReceivingAudioInput);
+            }
+        }, 2000);
     }
 
     /**
