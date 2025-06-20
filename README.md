@@ -93,7 +93,7 @@ transcriber.addEventListener("result", (e) => {
 To build the `dist/moonshine.min.js` file from source, first run `npm install`
 and then `npm run build`. You'll need to have the [Moonshine fork of
 @ricky0123/vad](https://github.com/moonshine-ai/vad-moonshine) in the parent
-folder of this repo.
+folder of this repo, and run `npm install` and `npm build` for the VAD too.
 
 To test that your built version is running correctly, `cd` into
 `examples/quickstart`, and in `index.js` comment out the import of moonshine
