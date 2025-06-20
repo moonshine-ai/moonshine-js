@@ -8,7 +8,9 @@ const vadCommitSeconds = 10
 export const Settings = {
     FRAME_SIZE: frameSize, // as specified by silero v5; changing this is not recommended
     STREAM_UPDATE_INTERVAL: updateInterval,
-    STREAM_COMMIT_INTERVAL: updateInterval * 6,
+    STREAM_COMMIT_MIN_INTERVAL: updateInterval * 4,
+    STREAM_COMMIT_MAX_INTERVAL: updateInterval * 8,
+    STREAM_COMMIT_EMA_PERIOD: 5,
     VAD_COMMIT_INTERVAL: Math.ceil((vadCommitSeconds * 10000) / frameSize),
     BASE_ASSET_PATH: {
         MOONSHINE: "https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/",
