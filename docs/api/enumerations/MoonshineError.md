@@ -12,7 +12,6 @@ can implement error handling as necessary for their application.
 
 | Enumeration Member | Value | Defined in |
 | ------ | ------ | ------ |
-| <a id="notreceivingaudioinput"></a> `NotReceivingAudioInput` | `string` | [error.ts:11](https://github.com/moonshine-ai/moonshine-js/blob/main/src/error.ts#L11) |
 | <a id="permissiondenied"></a> `PermissionDenied` | `string` | [error.ts:9](https://github.com/moonshine-ai/moonshine-js/blob/main/src/error.ts#L9) |
 | <a id="platformunsupported"></a> `PlatformUnsupported` | `string` | [error.ts:10](https://github.com/moonshine-ai/moonshine-js/blob/main/src/error.ts#L10) |
 

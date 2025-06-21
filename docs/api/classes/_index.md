@@ -5,7 +5,7 @@ title: "Classes"
 - [KeywordSpotter](/docs/api/classes/keywordspotter)
 - [MediaElementTranscriber](/docs/api/classes/mediaelementtranscriber)
 - [MicrophoneTranscriber](/docs/api/classes/microphonetranscriber)
+- [MoonshineSpeechRecognition](/docs/api/classes/moonshinespeechrecognition)
 - [MoonshineModel](/docs/api/classes/moonshinemodel)
 - [Transcriber](/docs/api/classes/transcriber)
-- [MoonshineSpeechRecognition](/docs/api/classes/moonshinespeechrecognition)
 - [VoiceController](/docs/api/classes/voicecontroller)

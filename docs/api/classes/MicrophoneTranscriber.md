@@ -210,7 +210,7 @@ Transcription will stop when [stop](/docs/api/classes/microphonetranscriber#stop
 stop(): void
 ```
 
-Defined in: [transcriber.ts:382](https://github.com/moonshine-ai/moonshine-js/blob/main/src/transcriber.ts#L382)
+Defined in: [transcriber.ts:369](https://github.com/moonshine-ai/moonshine-js/blob/main/src/transcriber.ts#L369)
 
 Stops transcription.
 

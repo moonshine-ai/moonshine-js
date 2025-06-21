@@ -60,7 +60,7 @@ var microphoneTranscriber = new Moonshine.MicrophoneTranscriber(
 // isn't strictly necessary since .start() will load the model if it's not
 // already loaded, but it's a good idea to do it in advance so that the user
 // doesn't have to wait for the model to load when they click the button.
-microphoneTranscriber.load();
+// microphoneTranscriber.load();
 
 var videoTranscriber = new Moonshine.MediaElementTranscriber(
     document.getElementById("video"),
@@ -68,7 +68,7 @@ var videoTranscriber = new Moonshine.MediaElementTranscriber(
     callbacks,
     false // use streaming mode, rather than VAD chunks
 );
-videoTranscriber.load();
+// videoTranscriber.load();
 
 button.addEventListener("click", () => {
     if (microphoneTranscriber.isActive) {
