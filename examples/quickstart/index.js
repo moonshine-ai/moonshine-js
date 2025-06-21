@@ -1,6 +1,6 @@
-import * as Moonshine from "https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.min.js"
+import * as Moonshine from "https://cdn.jsdelivr.net/npm/@moonshine-ai/moonshine-js@latest/dist/moonshine.min.js"
 // uncomment to use latest build in this repo
-// import * as Moonshine from "@usefulsensors/moonshine-js"
+// import * as Moonshine from "@moonshine-ai/moonshine-js"
 
 const state = document.getElementById("state")
 const button = document.getElementById("button")

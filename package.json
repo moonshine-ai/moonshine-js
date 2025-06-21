@@ -1,6 +1,6 @@
 {
-  "name": "@usefulsensors/moonshine-js",
-  "version": "0.1.22",
+  "name": "@moonshine-ai/moonshine-js",
+  "version": "0.1.23",
   "description": "On-device speech-to-text and voice control for web applications with Moonshine.",
   "type": "module",
   "scripts": {
@@ -8,7 +8,7 @@
     "dev": "npm run build && npx vite",
     "docs": "npx typedoc src/index.ts --plugin typedoc-plugin-markdown --out ./docs/api && node docs/postdocs.mjs && mv ./docs/api/globals.md ./docs/api/_index.md && rm ./docs/api/README.md"
   },
-  "author": "Useful Sensors",
+  "author": "Moonshine AI",
   "license": "MIT",
   "dependencies": {
     "@huggingface/transformers": "^3.3.3",
@@ -42,7 +42,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/usefulsensors/moonshine-js.git"
+    "url": "git+https://github.com/moonshine-ai/moonshine-js.git"
   },
   "keywords": [
     "asr",
@@ -54,7 +54,7 @@
     "recognition"
   ],
   "bugs": {
-    "url": "https://github.com/usefulsensors/moonshine-js/issues"
+    "url": "https://github.com/moonshine-ai/moonshine-js/issues"
   },
-  "homepage": "https://moonshinejs.com"
+  "homepage": "https://dev.moonshine.ai/#js"
 }

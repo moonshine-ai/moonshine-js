@@ -57,7 +57,7 @@ Defined in: [mediaElementTranscriber.ts:17](https://github.com/moonshine-ai/moon
 attachStream(stream): void
 ```
 
-Defined in: [transcriber.ts:297](https://github.com/moonshine-ai/moonshine-js/blob/main/src/transcriber.ts#L297)
+Defined in: [transcriber.ts:288](https://github.com/moonshine-ai/moonshine-js/blob/main/src/transcriber.ts#L288)
 
 Attaches a MediaStream to this [Transcriber](/docs/api/classes/transcriber) for transcription. A MediaStream must be attached before
 starting transcription.
@@ -84,7 +84,7 @@ starting transcription.
 detachStream(): void
 ```
 
-Defined in: [transcriber.ts:321](https://github.com/moonshine-ai/moonshine-js/blob/main/src/transcriber.ts#L321)
+Defined in: [transcriber.ts:312](https://github.com/moonshine-ai/moonshine-js/blob/main/src/transcriber.ts#L312)
 
 Detaches the MediaStream used for transcription.
 
@@ -106,7 +106,7 @@ Detaches the MediaStream used for transcription.
 getAudioBuffer(): AudioBuffer
 ```
 
-Defined in: [transcriber.ts:331](https://github.com/moonshine-ai/moonshine-js/blob/main/src/transcriber.ts#L331)
+Defined in: [transcriber.ts:322](https://github.com/moonshine-ai/moonshine-js/blob/main/src/transcriber.ts#L322)
 
 Returns the most recent AudioBuffer that was input to the underlying model for text generation. This is useful in cases where
 we want to double-check the audio being input to the model while debugging.
@@ -129,7 +129,7 @@ An AudioBuffer
 load(): Promise<void>
 ```
 
-Defined in: [transcriber.ts:174](https://github.com/moonshine-ai/moonshine-js/blob/main/src/transcriber.ts#L174)
+Defined in: [transcriber.ts:175](https://github.com/moonshine-ai/moonshine-js/blob/main/src/transcriber.ts#L175)
 
 #### Returns
 
@@ -175,7 +175,7 @@ starting transcription.
 stop(): void
 ```
 
-Defined in: [transcriber.ts:370](https://github.com/moonshine-ai/moonshine-js/blob/main/src/transcriber.ts#L370)
+Defined in: [transcriber.ts:382](https://github.com/moonshine-ai/moonshine-js/blob/main/src/transcriber.ts#L382)
 
 Stops transcription.
 
