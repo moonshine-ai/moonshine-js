@@ -22,6 +22,8 @@ export default class MoonshineModel {
     private eosTokenID: number = 2;
 
     private lastLatency: number | undefined = undefined;
+    private isModelLoading: boolean = false;
+    private loadPromise: Promise<void>;
 
     /**
      * Create (but do not load) a new MoonshineModel for inference.
@@ -51,6 +53,7 @@ export default class MoonshineModel {
                 headDim: 52,
             };
         }
+        Log.log(`New MoonshineModel with modelURL = ${modelURL}`);
     }
 
     private static getSessionOption() {
@@ -97,7 +100,7 @@ export default class MoonshineModel {
      *
      * @returns The average inference latency (in ms) over the number of samples taken.
      */
-    public async benchmarkExecutionEnvironment(
+    public async benchmark(
         sampleSize: number = 10
     ): Promise<number> {
         var samples = [];
@@ -123,23 +126,51 @@ export default class MoonshineModel {
 
     /**
      * Load the model weights.
+     *
+     * @remarks This can be a somewhat long-running (in the tens of seconds) async operation, depending on the user's connection and your choice of model (tiny vs base). 
+     * To avoid weird async problems that can occur with multiple calls to loadModel, we store and return a single Promise that resolves when the model is loaded.
      */
-    public async loadModel() {
-        const sessionOption = MoonshineModel.getSessionOption();
-        Log.info(
-            "MoonshineModel.loadModel: Using executionProviders: " +
-                sessionOption.executionProviders
-        );
+    public async loadModel(): Promise<void> {
+        if (!this.loadPromise) {
+            this.loadPromise = this.load();
+        }
+        return this.loadPromise;
+    }
 
-        this.model.encoder = await ort.InferenceSession.create(
-            this.modelURL + "/" + this.precision + "/encoder_model.onnx",
-            sessionOption
-        );
+    private async load(): Promise<void> {
+        if (!this.isLoading() && !this.isLoaded()) {
+            this.isModelLoading = true;
+            const sessionOption = MoonshineModel.getSessionOption();
+            Log.info(
+                `MoonshineModel.loadModel(): Loading model. Using executionProviders: ${sessionOption.executionProviders}`
+            );
 
-        this.model.decoder = await ort.InferenceSession.create(
-            this.modelURL + "/" + this.precision + "/decoder_model_merged.onnx",
-            sessionOption
-        );
+            this.model.encoder = await ort.InferenceSession.create(
+                this.modelURL + "/" + this.precision + "/encoder_model.onnx",
+                sessionOption
+            );
+
+            this.model.decoder = await ort.InferenceSession.create(
+                this.modelURL +
+                    "/" +
+                    this.precision +
+                    "/decoder_model_merged.onnx",
+                sessionOption
+            );
+            this.isModelLoading = false;
+        } else {
+            Log.log(
+                `MoonshineModel.loadModel(): Ignoring duplicate call. isLoading = ${this.isLoading()} and isLoaded = ${this.isLoaded()}`
+            );
+        }
+    }
+
+    /**
+     * Returns whether or not the model is in the process of loading.
+     * @returns true if the model is currently loading, false if not.
+     */
+    public isLoading(): boolean {
+        return this.isModelLoading;
     }
 
     /**
@@ -147,7 +178,9 @@ export default class MoonshineModel {
      * @returns true if the model is loaded, false if not.
      */
     public isLoaded(): boolean {
-        return this.model.encoder && this.model.decoder;
+        return (
+            this.model.encoder !== undefined && this.model.decoder !== undefined
+        );
     }
 
     /**

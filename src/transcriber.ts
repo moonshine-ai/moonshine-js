@@ -95,8 +95,9 @@ const defaultTranscriberCallbacks: TranscriberCallbacks = {
  * Read more about working with MediaStreams: {@link https://developer.mozilla.org/en-US/docs/Web/API/MediaStream}
  */
 class Transcriber {
+    private static models: Map<string, MoonshineModel> = new Map();
+    private sttModel: MoonshineModel;
     private vadModel: AudioNodeVAD;
-    static model: MoonshineModel;
     callbacks: TranscriberCallbacks;
 
     private frameBuffer: Float32Array;
@@ -164,15 +165,19 @@ class Transcriber {
         useVAD: boolean = true
     ) {
         this.callbacks = { ...defaultTranscriberCallbacks, ...callbacks };
-        Transcriber.model = new MoonshineModel(modelURL);
+        // we want to avoid re-downloading the same model weights if we can avoid it
+        // so we only create a new model of the requested type if it hasn't been already
+        if (!Transcriber.models.has(modelURL))
+            Transcriber.models.set(modelURL, new MoonshineModel(modelURL));
+        this.sttModel = Transcriber.models.get(modelURL);
         this.useVAD = useVAD;
         this.audioContext = new AudioContext();
     }
 
-    async load() {
+    public async load() {
         this.callbacks.onModelLoadStarted();
         try {
-            await Transcriber.model.loadModel();
+            await this.sttModel.loadModel();
         } catch (err) {
             this.callbacks.onError(MoonshineError.PlatformUnsupported);
             throw err;
@@ -208,7 +213,7 @@ class Transcriber {
                         frameCount < commitInterval &&
                         frameCount % Settings.STREAM_UPDATE_INTERVAL == 0
                     ) {
-                        Transcriber.model
+                        this.sttModel
                             ?.generate(
                                 this.frameBuffer.subarray(
                                     0,
@@ -226,7 +231,7 @@ class Transcriber {
                             0,
                             frameCount * Settings.FRAME_SIZE
                         );
-                        Transcriber.model?.generate(tmpBuffer).then((text) => {
+                        this.sttModel?.generate(tmpBuffer).then((text) => {
                             // buffer is about to be cleared; commit the transcript
                             if (text) {
                                 this.callbacks.onTranscriptionCommitted(text);
@@ -259,7 +264,7 @@ class Transcriber {
                     0,
                     frameCount * Settings.FRAME_SIZE
                 );
-                Transcriber.model?.generate(tmpBuffer).then((text) => {
+                this.sttModel?.generate(tmpBuffer).then((text) => {
                     if (text) {
                         this.callbacks.onTranscriptionCommitted(text);
                     }
@@ -338,12 +343,15 @@ class Transcriber {
      * Note that the {@link Transcriber} must have a MediaStream attached via {@link Transcriber.attachStream} before
      * starting transcription.
      */
-    async start() {
+    public async start() {
         if (!this.isActive) {
             this.isActive = true;
 
             // load model if not loaded
-            if (!Transcriber.model.isLoaded() || this.vadModel === undefined) {
+            if (
+                (!this.sttModel.isLoaded() && !this.sttModel.isLoading()) ||
+                this.vadModel === undefined
+            ) {
                 await this.load();
             }
 
@@ -363,7 +371,7 @@ class Transcriber {
     /**
      * Stops transcription.
      */
-    stop() {
+    public stop() {
         this.isActive = false;
         this.callbacks.onTranscribeStopped();
         if (this.vadModel) {
