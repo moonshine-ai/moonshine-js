@@ -105,8 +105,6 @@ class Transcriber {
 
     protected audioContext: AudioContext;
     public isActive: boolean = false;
-    private previousFrameCount: number = 0;
-    private frameCountInterval;
 
     /**
      * Creates a transcriber for transcribing a MediaStream from any source. After creating the {@link Transcriber}, you must invoke
@@ -169,7 +167,6 @@ class Transcriber {
         Transcriber.model = new MoonshineModel(modelURL);
         this.useVAD = useVAD;
         this.audioContext = new AudioContext();
-        this.previousFrameCount = 0;
     }
 
     async load() {
@@ -355,8 +352,8 @@ class Transcriber {
             this.audioContext.resume();
             setTimeout(() => {
                 if (this.audioContext.state === "suspended") {
-                    console.warn(
-                        "MoonshineJS:AudioContext is suspended, this usually happens on Chrome when you start trying to access a an audio source (like a microphone or video) before the user has interacted with the page. Chrome blocks access until there has been a user gesture, so you'll need to rework your code to call start() after an interaction."
+                    Log.warn(
+                        "AudioContext is suspended, this usually happens on Chrome when you start trying to access an audio source (like a microphone or video) before the user has interacted with the page. Chrome blocks access until there has been a user gesture, so you'll need to rework your code to call start() after an interaction."
                     );
                 }
             }, 1000);
@@ -372,7 +369,6 @@ class Transcriber {
         if (this.vadModel) {
             this.vadModel.pause();
         }
-        clearInterval(this.frameCountInterval);
     }
 
     private flushBuffer() {
