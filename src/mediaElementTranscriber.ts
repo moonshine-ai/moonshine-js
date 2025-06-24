@@ -103,15 +103,15 @@ class VideoCaptioner extends MediaElementTranscriber {
             if (shouldCommit) {
                 commit = `${commit} ${text}`;
                 commitElement.textContent = commit;
+                updateElement.textContent = "";
+            } else {
+                updateElement.textContent = `\u00A0${text}`;
             }
-            commitElement.textContent = commit;
-            updateElement.textContent = `\u00A0${text}`;
         }
 
         this.callbacks.onTranscriptionUpdated = function (text) {
-            if (text) {
+            if (text)
                 setCaption(text, 60, 2);
-            }
         };
         this.callbacks.onTranscriptionCommitted = function (text) {
             setCaption(text, 60, 2, true);
