@@ -49,7 +49,7 @@ interface TranscriberCallbacks {
 
     onTranscriptionUpdated: (text: string) => any;
 
-    onTranscriptionCommitted: (text: string) => any;
+    onTranscriptionCommitted: (text: string, buffer?: AudioBuffer) => any;
 
     onFrame: (probs, frame, ema) => any;
 
@@ -77,13 +77,15 @@ const defaultTranscriberCallbacks: TranscriberCallbacks = {
     onTranscribeStopped: function () {
         Log.log("Transcriber.onTranscribeStopped()");
     },
-    onTranscriptionUpdated: function (text: string | undefined) {
+    onTranscriptionUpdated: function (text: string) {
         Log.log("Transcriber.onTranscriptionUpdated(" + text + ")");
     },
-    onTranscriptionCommitted: function (text: string | undefined) {
+    onTranscriptionCommitted: function (text: string, buffer?: AudioBuffer) {
         Log.log("Transcriber.onTranscriptionCommitted(" + text + ")");
     },
-    onFrame: function (probs, frame, ema) {},
+    onFrame: function (probs, frame, ema) {
+        Log.log("Transcriber.onFrame()");
+    },
     onSpeechStart: function () {
         Log.log("Transcriber.onSpeechStart()");
     },
@@ -97,18 +99,16 @@ class SpeechBuffer {
     private frameCount: number;
     public frameEMA: number;
     private speechEMA: (value: number) => any;
-    private minCommitInterval: number;
-    private maxCommitInterval: number;
+    private useVAD: boolean;
 
-    constructor(minCommitInterval: number, maxCommitInterval: number) {
-        this.minCommitInterval = minCommitInterval;
-        this.maxCommitInterval = maxCommitInterval;
+    constructor(useVAD: boolean) {
+        this.useVAD = useVAD;
         this.flush();
     }
 
     public flush(): void {
         this.buffer = new Float32Array(
-            this.maxCommitInterval * Settings.FRAME_SIZE
+            this.maxCommitInterval() * Settings.FRAME_SIZE
         );
         this.speechEMA = this.ema(Settings.STREAM_COMMIT_EMA_PERIOD);
         this.frameEMA = 0.0;
@@ -138,12 +138,12 @@ class SpeechBuffer {
     }
 
     public shouldSet(): boolean {
-        return this.frameCount <= this.maxCommitInterval;
+        return this.frameCount <= this.maxCommitInterval();
     }
 
     public shouldUpdate(): boolean {
         return (
-            this.frameCount < this.maxCommitInterval &&
+            this.frameCount < this.maxCommitInterval() &&
             this.frameCount % Settings.STREAM_UPDATE_INTERVAL === 0
         );
     }
@@ -151,16 +151,17 @@ class SpeechBuffer {
     public shouldCommit(): boolean {
         if (
             this.frameEMA <= 0.5 &&
-            this.frameCount >= this.minCommitInterval &&
-            this.frameCount < this.maxCommitInterval
+            this.frameCount >= this.minCommitInterval() &&
+            this.frameCount < this.maxCommitInterval()
         ) {
             Log.log(`Speech pause, frameCount: ${this.frameCount}`);
-        } else if (this.frameCount === this.maxCommitInterval) {
+        } else if (this.frameCount === this.maxCommitInterval()) {
             Log.log(`Forced commit, frameCount: ${this.frameCount}`);
         }
         return (
-            this.frameCount === this.maxCommitInterval ||
-            (this.frameEMA <= 0.5 && this.frameCount >= this.minCommitInterval)
+            this.frameCount === this.maxCommitInterval() ||
+            (this.frameEMA <= 0.5 &&
+                this.frameCount >= this.minCommitInterval())
         );
     }
 
@@ -176,6 +177,16 @@ class SpeechBuffer {
             }
             return emaPrev;
         };
+    }
+
+    private minCommitInterval(): number {
+        return Settings.STREAM_COMMIT_MIN_INTERVAL;
+    }
+
+    private maxCommitInterval(): number {
+        return this.useVAD
+            ? Settings.VAD_COMMIT_INTERVAL
+            : Settings.STREAM_COMMIT_MAX_INTERVAL;
     }
 }
 
@@ -275,14 +286,8 @@ class Transcriber {
 
         // behavior
         // useVAD:  commit every 30s or onSpeechEnd
-        // !useVAD: update every updateInterval frames; commit on maxFrames
-
-        this.speechBuffer = new SpeechBuffer(
-            Settings.STREAM_COMMIT_MIN_INTERVAL,
-            this.useVAD
-                ? Settings.VAD_COMMIT_INTERVAL
-                : Settings.STREAM_COMMIT_MAX_INTERVAL
-        );
+        // !useVAD: update every updateInterval frames; commit on detected pause (w/ EMA below threshold) occurring between min and max interval OR on max.
+        this.speechBuffer = new SpeechBuffer(this.useVAD);
         var isTalking = false;
 
         const onFrameProcessed = (p, frame) => {
@@ -294,8 +299,12 @@ class Transcriber {
                 }
                 if (this.speechBuffer.hasFrames()) {
                     // update
-                    if (!this.useVAD && this.speechBuffer.shouldUpdate() && !this.speechBuffer.shouldCommit()) {
-                        Transcriber.model
+                    if (
+                        !this.useVAD &&
+                        this.speechBuffer.shouldUpdate() &&
+                        !this.speechBuffer.shouldCommit()
+                    ) {
+                        this.sttModel
                             ?.generate(this.speechBuffer.subarray())
                             .then((text) => {
                                 this.callbacks.onTranscriptionUpdated(text);
@@ -308,13 +317,14 @@ class Transcriber {
                     else if (this.speechBuffer.shouldCommit()) {
                         // in this case we need to copy the buffer so that it doesn't get cleared before the inference happens
                         var tmpBuffer = this.speechBuffer.copy();
-                        Transcriber.model
+                        this.sttModel
                             ?.generate(tmpBuffer)
                             .then((text) => {
                                 // buffer is about to be cleared; commit the transcript
                                 if (text) {
                                     this.callbacks.onTranscriptionCommitted(
-                                        text
+                                        text,
+                                        this.getAudioBuffer(tmpBuffer)
                                     );
                                 }
                             })
@@ -344,9 +354,12 @@ class Transcriber {
                 Log.log("Transcriber.onSpeechEnd()");
                 this.callbacks.onSpeechEnd();
                 var tmpBuffer = this.speechBuffer.copy();
-                Transcriber.model?.generate(tmpBuffer).then((text) => {
+                this.sttModel?.generate(tmpBuffer).then((text) => {
                     if (text) {
-                        this.callbacks.onTranscriptionCommitted(text);
+                        this.callbacks.onTranscriptionCommitted(
+                            text,
+                            this.getAudioBuffer(tmpBuffer)
+                        );
                     }
                 });
                 this.speechBuffer.flush();
@@ -400,16 +413,15 @@ class Transcriber {
      *
      * @returns An AudioBuffer
      */
-    public getAudioBuffer(): AudioBuffer {
-        // const numChannels = 1;
-        // const audioBuffer = this.audioContext.createBuffer(
-        //     numChannels,
-        //     this.bufferState.buffer.length,
-        //     16000
-        // );
-        // audioBuffer.getChannelData(0).set(this.bufferState.buffer);
-        // return audioBuffer;
-        return undefined;
+    public getAudioBuffer(buffer: Float32Array): AudioBuffer {
+        const numChannels = 1;
+        const audioBuffer = this.audioContext.createBuffer(
+            numChannels,
+            buffer.length,
+            16000
+        );
+        audioBuffer.getChannelData(0).set(buffer);
+        return audioBuffer;
     }
 
     /**
