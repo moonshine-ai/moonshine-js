@@ -53,4 +53,70 @@ class MediaElementTranscriber extends Transcriber {
     }
 }
 
-export default MediaElementTranscriber;
+/**
+ * Transcribes a <video> element, rendering the results as captions on the video.
+ */
+class VideoCaptioner extends MediaElementTranscriber {
+    public constructor(
+        videoElement: HTMLVideoElement,
+        modelURL: string,
+        useVAD: boolean = false
+    ) {
+        super(videoElement, modelURL, {}, useVAD);
+
+        const wrapper = document.createElement("div");
+        wrapper.style.display = "inline-block";
+        wrapper.style.position = "relative";
+        wrapper.style.width = getComputedStyle(videoElement).width;
+        wrapper.style.height = getComputedStyle(videoElement).height;
+
+        const captionsWrapper = document.createElement("div");
+        captionsWrapper.style.position = "absolute";
+        captionsWrapper.style.bottom = "20px";
+        captionsWrapper.style.color = "#ffffff";
+        captionsWrapper.style.fontSize = "2rem";
+        captionsWrapper.style.fontFamily = "sans-serif";
+        captionsWrapper.style.zIndex = "2";
+        captionsWrapper.style.height = "96px";
+        captionsWrapper.style.width = getComputedStyle(videoElement).width;
+        captionsWrapper.style.overflowY = "hidden";
+
+        const commitElement = document.createElement("span");
+        commitElement.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
+        captionsWrapper.appendChild(commitElement);
+
+        const updateElement = document.createElement("span");
+        updateElement.style.color = "#aaaaaa";
+        updateElement.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
+        captionsWrapper.appendChild(updateElement);
+
+        videoElement.parentElement.insertBefore(wrapper, videoElement);
+        wrapper.appendChild(captionsWrapper);
+        wrapper.appendChild(videoElement);
+
+        var commit = "";
+
+        function setCaption(text, maxChars, maxLines, shouldCommit = false) {
+            if (commit.length + text.length >= maxChars * maxLines) {
+                commit = "";
+            }
+            if (shouldCommit) {
+                commit = `${commit} ${text}`;
+                commitElement.textContent = commit;
+            }
+            commitElement.textContent = commit;
+            updateElement.textContent = `\u00A0${text}`;
+        }
+
+        this.callbacks.onTranscriptionUpdated = function (text) {
+            if (text) {
+                setCaption(text, 60, 2);
+            }
+        };
+        this.callbacks.onTranscriptionCommitted = function (text) {
+            setCaption(text, 60, 2, true);
+        };
+    }
+}
+
+export { MediaElementTranscriber, VideoCaptioner };
