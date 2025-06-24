@@ -20,6 +20,7 @@ abstract class VoiceController implements TranscriberCallbacks {
     onTranscribeStopped: () => any;
     onTranscriptionCommitted: (text: string | undefined) => any;
     onTranscriptionUpdated: (text: string | undefined) => any;
+    onFrame: (probs, frame, ema) => any;
     onSpeechStart: () => any;
     onSpeechEnd: () => any;
 
@@ -62,6 +63,11 @@ abstract class VoiceController implements TranscriberCallbacks {
             callbacks.onTranscriptionCommitted ??
             function () {
                 Log.log("VoiceController.onTranscriptionCommitted()");
+            };
+        this.onFrame =
+            callbacks.onFrame ??
+            function () {
+                Log.log("VoiceController.onFrame()");
             };
         this.onSpeechStart =
             callbacks.onSpeechStart ??
