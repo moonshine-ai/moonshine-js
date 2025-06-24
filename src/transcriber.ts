@@ -160,7 +160,7 @@ class SpeechBuffer {
         }
         return (
             this.frameCount === this.maxCommitInterval() ||
-            (this.frameEMA <= 0.5 &&
+            (this.frameEMA <= Settings.STREAM_COMMIT_EMA_THRESHOLD &&
                 this.frameCount >= this.minCommitInterval())
         );
     }
