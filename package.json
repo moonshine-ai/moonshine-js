@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npm run docs && npx rollup --config",
     "dev": "npm run build && npx vite",
-    "docs": "npx typedoc src/index.ts --plugin typedoc-plugin-markdown --out ./docs/"
+    "docs": "npx typedoc"
   },
   "author": "Moonshine AI",
   "license": "MIT",
@@ -26,8 +26,7 @@
     "rollup-plugin-import-css": "^3.5.8",
     "rollup-plugin-svg-import": "^3.0.0",
     "tslib": "^2.8.1",
-    "typedoc": "^0.27.9",
-    "typedoc-plugin-markdown": "^4.4.2",
+    "typedoc-github-theme": "^0.3.0",
     "typescript": "^5.7.2",
     "vite": "^6.0.3"
   },

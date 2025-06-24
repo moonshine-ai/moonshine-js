@@ -2,6 +2,9 @@ import { TranscriberCallbacks } from "./transcriber";
 import { pipeline } from "@huggingface/transformers";
 import Log from "./log";
 
+/**
+ * Maps a list of key phrases to a user-specified function invocation. 
+ */
 type CommandHandlers = {
     [key: string]: (...args: any[]) => any;
 };

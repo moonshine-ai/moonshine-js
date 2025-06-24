@@ -2,7 +2,7 @@
 
 MoonshineJS makes it easy for web developers to build modern, speech-driven web experiences without sacrificing user privacy. We build on three key principles:
 
--   **Fast Transcription**: easily generate real-time transcriptions of speech from streaming audio sources in the browser.
+-   **Fast Transcription**: easily generate real-time speech-to-text from audio streams in the browser.
 -   **Easy Voice Control**: build feature-rich voice-controlled web apps in < 10 lines of code.
 -   **Local Processing**: all audio processing happens locally in the user's web browser—no cloud services or privacy violations required.
 
@@ -72,7 +72,7 @@ transcriber.start();
 
 Now the transcription will only update between pauses in speech.
 
-That's all it takes to get started! Read [the guides](https://moonshinejs.com/docs/guide/) to learn how to transcribe audio from other sources, or to build voice-controlled applications.
+That's all it takes to get started! Read [the guides](https://moonshine-ai.github.io/moonshine-js/) to learn how to transcribe audio from other sources, or to build voice-controlled applications.
 
 ## Web Speech Polyfill
 
