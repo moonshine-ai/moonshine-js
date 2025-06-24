@@ -50,7 +50,7 @@ class MediaElementTranscriber extends Transcriber {
 }
 
 /**
- * Transcribes a <video> element, rendering the results as captions on the video.
+ * Transcribes a `<video>` element, rendering the results as captions on the video.
  */
 class VideoCaptioner extends MediaElementTranscriber {
 

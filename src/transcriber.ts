@@ -406,7 +406,7 @@ class Transcriber {
 
     /**
      * Detaches the MediaStream used for transcription.
-     * @todo
+     * TODO
      */
     public detachStream() {
         // TODO
