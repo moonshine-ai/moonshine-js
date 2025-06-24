@@ -8,11 +8,7 @@ class MediaElementTranscriber extends Transcriber {
     private mediaElement: HTMLMediaElement;
 
     /**
-     *
-     * @param mediaElement
-     * @param modelURL
-     * @param callbacks
-     * @param useVAD
+     * Creates a transcriber that generates transcriptions from the output of HTML `<audio>` or `<video>` elements.
      */
     public constructor(
         mediaElement: HTMLMediaElement,
@@ -30,7 +26,7 @@ class MediaElementTranscriber extends Transcriber {
         });
     }
 
-    async start() {
+    public async start() {
         if (!this.isAttached) {
             // source: media element
             const source = this.audioContext.createMediaElementSource(
@@ -57,6 +53,10 @@ class MediaElementTranscriber extends Transcriber {
  * Transcribes a <video> element, rendering the results as captions on the video.
  */
 class VideoCaptioner extends MediaElementTranscriber {
+
+    /**
+     * Creates a transcriber that overlays transcription output as captions on a `<video>` element.
+     */
     public constructor(
         videoElement: HTMLVideoElement,
         modelURL: string,

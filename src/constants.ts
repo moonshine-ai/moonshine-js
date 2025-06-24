@@ -14,7 +14,7 @@ export const Settings = {
     STREAM_COMMIT_EMA_PERIOD: 5,
     VAD_COMMIT_INTERVAL: Math.ceil((vadCommitSeconds * 10000) / frameSize),
     BASE_ASSET_PATH: {
-        MOONSHINE: "https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/",
+        MOONSHINE: "https://cdn.jsdelivr.net/npm/@moonshine-ai/moonshine-js@latest/dist/",
         ONNX_RUNTIME: "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.22.0/dist/",
         SILERO_VAD: "https://cdn.jsdelivr.net/npm/@ricky0123/vad-web@0.0.24/dist/"
     },

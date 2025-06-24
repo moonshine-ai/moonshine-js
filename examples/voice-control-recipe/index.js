@@ -1,4 +1,4 @@
-import * as Moonshine from "https://cdn.jsdelivr.net/npm/@usefulsensors/moonshine-js@latest/dist/moonshine.min.js";
+import * as Moonshine from "https://cdn.jsdelivr.net/npm/@moonshine-ai/moonshine-js@latest/dist/moonshine.min.js";
 
 function scrollToElement(e) {
     const lastActive = document.querySelector(".text-success")

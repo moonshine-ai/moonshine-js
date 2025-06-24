@@ -19,5 +19,5 @@
         "**/node_modules/**"
     ],
     "skipErrorChecking": true,
-    "publicPath": "/docs/api/"
+    "publicPath": "/docs/"
 }

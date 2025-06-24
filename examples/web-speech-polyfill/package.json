@@ -4,13 +4,13 @@
   "description": "An example of the Moonshine Web Speech API polyfill",
   "main": "index.js",
   "scripts": {
-    "dev": "npm uninstall @usefulsensors/moonshine-js && npm install ../../ && npx vite",
+    "dev": "npm uninstall @moonshine-ai/moonshine-js && npm install ../../ && npx vite",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Useful Sensors",
+  "author": "Moonshine AI",
   "license": "MIT",
   "dependencies": {
-    "@usefulsensors/moonshine-js": "file:../..",
+    "@moonshine-ai/moonshine-js": "file:../..",
     "vite": "^6.0.7"
   }
 }

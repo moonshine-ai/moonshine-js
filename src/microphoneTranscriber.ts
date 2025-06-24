@@ -1,4 +1,3 @@
-import { Settings } from "./constants";
 import { Transcriber, TranscriberCallbacks } from "./transcriber";
 import { MoonshineError } from "./error";
 
@@ -14,11 +13,17 @@ class MicrophoneTranscriber extends Transcriber {
      * This basic example demonstrates the use of the transcriber with custom callbacks:
      *
      * ``` ts
-     * import MicrophoneTranscriber from "@usefulsensors/moonshine-js";
+     * import MicrophoneTranscriber from "@moonshine-ai/moonshine-js";
      *
      * var transcriber = new MicrophoneTranscriber(
      *      "model/tiny"
      *      {
+     *          onPermissionsRequested() {
+     *              console.log("Requesting permissions.") 
+     *          },
+     *          onError(error) {
+     *              console.log(`Error: ${error}`)
+     *          },
      *          onModelLoadStarted() {
      *              console.log("onModelLoadStarted()");
      *          },
@@ -28,17 +33,18 @@ class MicrophoneTranscriber extends Transcriber {
      *          onTranscribeStopped() {
      *              console.log("onTranscribeStopped()");
      *          },
-     *          onTranscriptionUpdated(text: string | undefined) {
+     *          onTranscriptionUpdated(text: string) {
      *              console.log(
      *                  "onTranscriptionUpdated(" + text + ")"
      *              );
      *          },
-     *          onTranscriptionCommitted(text: string | undefined) {
+     *          onTranscriptionCommitted(text: string) {
      *              console.log(
      *                  "onTranscriptionCommitted(" + text + ")"
      *              );
      *          },
      *      },
+     *      false // use streaming mode
      * );
      *
      * transcriber.start();
@@ -53,17 +59,11 @@ class MicrophoneTranscriber extends Transcriber {
     }
 
     /**
-     * Starts transcription.
+     * Starts transcription. This will request permission to access the user's microphone, if it hasn't already been granted.
      *
-     * This will request microphone permissions (if not already provided), load the model (if not already loaded), and do
-     * one of the following:
-     * 
-     * if `useVAD === true`: generate an updated transcription at the end of every chunk of detected voice activity.
-     * else if `useVAD === false`: generate an updated transcription every {@link Settings.FRAME_SIZE} milliseconds. 
-     * 
-     * Transcription will stop when {@link stop} is called, or when {@link Settings.MAX_RECORD_MS} is passed (whichever comes first).
+     * Transcription will stop when {@link stop} is called.
      */
-    async start() {
+    public async start() {
         // get stream from microphone input
         const status = await navigator.permissions.query({ name: "microphone" as PermissionName });
         if (status.state == "denied") {

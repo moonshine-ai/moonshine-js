@@ -18,8 +18,8 @@ abstract class VoiceController implements TranscriberCallbacks {
     onModelLoaded: () => any;
     onTranscribeStarted: () => any;
     onTranscribeStopped: () => any;
-    onTranscriptionCommitted: (text: string | undefined) => any;
-    onTranscriptionUpdated: (text: string | undefined) => any;
+    onTranscriptionCommitted: (text: string) => any;
+    onTranscriptionUpdated: (text: string) => any;
     onFrame: (probs, frame, ema) => any;
     onSpeechStart: () => any;
     onSpeechEnd: () => any;
@@ -93,7 +93,7 @@ abstract class VoiceController implements TranscriberCallbacks {
  * with no ambiguity, e.g., matching the exact words "scroll up" to a scroll up action.
  */
 class KeywordSpotter extends VoiceController {
-    onTranscriptionUpdated = (text: string | undefined) => {
+    onTranscriptionUpdated = (text: string) => {
         if (text) {
             Log.log("KeywordSpotter.onTranscriptionUpdated(" + text + ")");
             text = VoiceController.normalizeText(text);
@@ -152,7 +152,6 @@ class IntentClassifier extends VoiceController {
     }
 
     /**
-     *
      * @param text
      * @returns
      */
@@ -253,7 +252,7 @@ class IntentClassifier extends VoiceController {
         });
     }
 
-    onTranscriptionUpdated = (text: string | undefined) => {
+    onTranscriptionUpdated = (text: string) => {
         if (text) {
             this.getIntent(text).then((intent) => {
                 this.commandHandlers[intent](

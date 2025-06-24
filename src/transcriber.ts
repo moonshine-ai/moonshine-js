@@ -10,7 +10,7 @@ import Log from "./log";
  *
  * @property onPermissionsRequested() - called when permissions to a user resource (e.g., microphone) have been requested (but not necessarily granted yet)
  *
- * @property onError(error: MoonshineError) - called when an error occurs.
+ * @property onError(error: {@link MoonshineError}) - called when an error occurs.
  *
  * @property onModelLoadStarted() - called when the {@link MoonshineModel} and VAD begins to load (or download, if hosted elsewhere)
  *
@@ -20,14 +20,14 @@ import Log from "./log";
  *
  * @property onTranscribeStopped() - called once when transcription stops
  *
- * @property onTranscriptionUpdated(text: string) - called every {@link Settings.STREAM_UPDATE_INTERVAL} milliseconds while
- * transcription is active if useVAD == false. Use this callback when you don't need long-running transcription - you only care about
- * the most-recent transcription output. Note that the transcription output may be empty in some cases.
+ * @property onTranscriptionUpdated(text: string) - when `useVAD === false` (i.e., streaming mode), this callback is invoked on a rapid
+ * interval ({@link Settings.STREAM_UPDATE_INTERVAL}), with the speculative transcription of the audio.
  *
- * @property onTranscriptionCommitted(text: string) - called every {@link Settings.STREAM_COMMIT_INTERVAL} milliseconds while
- * transcription is active and useVAD == false, or every {@link Settings.VAD_COMMIT_INTERVAL} when useVAD == true. Use this callback
- * for a long-running transcription of audio, like captioning a video or microphone stream.
+ * @property onTranscriptionCommitted(text: string, buffer?: AudioBuffer) - called every time a transcript is "committed"; when `useVAD === false` (streaming mode),
+ * the transcript is committed between brief pauses in speech. When `useVAD === true`, the transcript is committed after speech events, or during brief pauses in long speech events.
  *
+ * @property onFrame(probability, frame, ema) - called every frame of audio
+ * 
  * @property onSpeechStart() - called when the VAD model detects the start of speech
  *
  * @property onSpeechEnd() - called when the VAD model detects the end of speech
@@ -219,14 +219,15 @@ class Transcriber {
      * transcription lifecycle. For transcription-only use cases, you should define the {@link TranscriberCallbacks} yourself;
      * when using the transcriber for voice control, you should create a {@link VoiceController} and pass it in.
      *
-     * @param useVAD A boolean specifying whether or not to use Voice Activity Detection (VAD) on audio processed by the transcriber.
-     * When set to `true`, the transcriber will only process speech at the end of each chunk of voice activity.
+     * @param useVAD A boolean specifying whether or not to use Voice Activity Detection (VAD) for deciding when to perform transcriptions.
+     * When set to `true`, the transcriber will only process speech at the end of each chunk of voice activity; when set to `false`, the transcriber will
+     * operate in streaming mode, generating continuous transcriptions on a rapid interval.
      *
      * @example
      * This basic example demonstrates the use of the transcriber with custom callbacks:
      *
      * ``` ts
-     * import Transcriber from "@usefulsensors/moonshine-js";
+     * import Transcriber from "@moonshine-ai/moonshine-js";
      *
      * var transcriber = new Transcriber(
      *      "model/tiny",
@@ -250,7 +251,8 @@ class Transcriber {
      *                  "onTranscriptionCommitted(" + text + ")"
      *              );
      *          },
-     *      }
+     *      },
+     *      false // use streaming mode
      * );
      *
      * // Get a MediaStream from somewhere (user mic, active tab, an <audio> element, WebRTC source, etc.)
@@ -275,7 +277,10 @@ class Transcriber {
         this.audioContext = new AudioContext();
     }
 
-    public async load() {
+    /**
+     * Preloads the models and initializes the buffer required for transcription.
+     */
+    public async load(): Promise<void> {
         this.callbacks.onModelLoadStarted();
         try {
             await this.sttModel.loadModel();
@@ -426,9 +431,6 @@ class Transcriber {
 
     /**
      * Starts transcription.
-     *
-     * if `useVAD === true`: generate an updated transcription at the end of every chunk of detected voice activity.
-     * else if `useVAD === false`: generate an updated transcription every {@link Settings.STREAM_UPDATE_INTERVAL}.
      *
      * Transcription will stop when {@link stop} is called.
      *

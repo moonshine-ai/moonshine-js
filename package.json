@@ -6,7 +6,7 @@
   "scripts": {
     "build": "npm run docs && npx rollup --config",
     "dev": "npm run build && npx vite",
-    "docs": "npx typedoc src/index.ts --plugin typedoc-plugin-markdown --out ./docs/api && node docs/postdocs.mjs && mv ./docs/api/globals.md ./docs/api/_index.md && rm ./docs/api/README.md"
+    "docs": "npx typedoc src/index.ts --plugin typedoc-plugin-markdown --out ./docs/"
   },
   "author": "Moonshine AI",
   "license": "MIT",

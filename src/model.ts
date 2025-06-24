@@ -90,8 +90,7 @@ export default class MoonshineModel {
     }
 
     /**
-     * Tests the inference latency of the current environment. This is useful for determining the appropriate
-     * {@link Settings.FRAME_SIZE} and {@link Settings.MAX_SPEECH_SECS} for a given execution environment.
+     * Tests the inference latency of the current environment.
      *
      * @remarks Warning: since this uses noise to benchmark the model, the model will have lower performance if you to use it
      * for transcription immediately after benchmarking.
@@ -118,6 +117,7 @@ export default class MoonshineModel {
 
     /**
      * Returns the latency (in ms) of the most recent call to {@link MoonshineModel.generate}
+     * 
      * @returns A latency reading (in ms)
      */
     public getLatency(): number {
@@ -167,7 +167,8 @@ export default class MoonshineModel {
 
     /**
      * Returns whether or not the model is in the process of loading.
-     * @returns true if the model is currently loading, false if not.
+     * 
+     * @returns `true` if the model is currently loading, `false` if not.
      */
     public isLoading(): boolean {
         return this.isModelLoading;
@@ -175,7 +176,8 @@ export default class MoonshineModel {
 
     /**
      * Returns whether or not the model weights have been loaded.
-     * @returns true if the model is loaded, false if not.
+     * 
+     * @returns `true` if the model is loaded, `false` if not.
      */
     public isLoaded(): boolean {
         return (
@@ -185,8 +187,9 @@ export default class MoonshineModel {
 
     /**
      * Generate a transcription of the passed audio.
-     * @param audio A Float32Array containing raw audio samples from an audio source (e.g., a wav file, or a user's microphone)
-     * @returns A Promise that resolves with the generated transcription.
+     * 
+     * @param audio A `Float32Array` containing raw audio samples from an audio source (e.g., a wav file, or a user's microphone)
+     * @returns A `Promise<string>` that resolves with the generated transcription.
      */
     public async generate(audio: Float32Array): Promise<string> {
         if (this.isLoaded()) {
