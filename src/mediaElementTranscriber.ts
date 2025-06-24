@@ -64,22 +64,27 @@ class VideoCaptioner extends MediaElementTranscriber {
     ) {
         super(videoElement, modelURL, {}, useVAD);
 
+        const parentHeight = videoElement.clientHeight;
+        const parentWidth = videoElement.clientWidth;
+
         const wrapper = document.createElement("div");
         wrapper.style.display = "inline-block";
         wrapper.style.position = "relative";
-        wrapper.style.width = getComputedStyle(videoElement).width;
-        wrapper.style.height = getComputedStyle(videoElement).height;
+        wrapper.style.width = `${parentWidth}`;
+        wrapper.style.height = `${parentHeight}`;
+
+        const baseSize = Math.min(parentWidth, parentHeight);
+        const fontSize = baseSize * 0.05;
 
         const captionsWrapper = document.createElement("div");
         captionsWrapper.style.position = "absolute";
-        captionsWrapper.style.bottom = "20px";
+        captionsWrapper.style.bottom = `${(parentHeight/3) - (fontSize*3)}px`;
         captionsWrapper.style.color = "#ffffff";
-        captionsWrapper.style.fontSize = "2rem";
+        captionsWrapper.style.fontSize = `${fontSize}px`;
         captionsWrapper.style.fontFamily = "sans-serif";
         captionsWrapper.style.zIndex = "2";
-        captionsWrapper.style.height = "96px";
-        captionsWrapper.style.width = getComputedStyle(videoElement).width;
-        captionsWrapper.style.overflowY = "hidden";
+        captionsWrapper.style.height = `${fontSize * 3}px`;
+        captionsWrapper.style.width = `${parentWidth}`;
 
         const commitElement = document.createElement("span");
         commitElement.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
@@ -110,8 +115,7 @@ class VideoCaptioner extends MediaElementTranscriber {
         }
 
         this.callbacks.onTranscriptionUpdated = function (text) {
-            if (text)
-                setCaption(text, 60, 2);
+            if (text) setCaption(text, 60, 2);
         };
         this.callbacks.onTranscriptionCommitted = function (text) {
             setCaption(text, 60, 2, true);
