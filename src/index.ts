@@ -1,10 +1,17 @@
 import MoonshineModel from "./model";
-import MediaElementTranscriber from "./mediaElementTranscriber"
+import {
+    MediaElementTranscriber,
+    VideoCaptioner,
+} from "./mediaElementTranscriber";
 import MicrophoneTranscriber from "./microphoneTranscriber";
 import MoonshineSpeechRecognition from "./webSpeechPolyfill";
 import { Transcriber, TranscriberCallbacks } from "./transcriber";
 import { Settings } from "./constants";
-import { VoiceController, KeywordSpotter, IntentClassifier } from "./voiceController";
+import {
+    VoiceController,
+    KeywordSpotter,
+    IntentClassifier,
+} from "./voiceController";
 import { MoonshineError } from "./error";
 
 export {
@@ -15,8 +22,9 @@ export {
     Transcriber,
     MicrophoneTranscriber,
     MediaElementTranscriber,
+    VideoCaptioner,
     TranscriberCallbacks,
     VoiceController,
     KeywordSpotter,
-    IntentClassifier
-}
+    IntentClassifier,
+};
