@@ -6,8 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Moonshine AI",
+  "license": "MIT",
   "description": "",
   "dependencies": {
     "@moonshine-ai/moonshine-js": "file:../..",

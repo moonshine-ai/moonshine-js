@@ -1,16 +1,16 @@
 {
-  "name": "moonshine-voice-game",
+  "name": "moonshine-voice-control-basic",
   "version": "1.0.0",
-  "description": "A voice-controlled game, powered by client-side speech-to-text with Moonshine models",
+  "description": "A voice-controlled light switch, powered by client-side speech-to-text with Moonshine models",
   "main": "index.js",
   "scripts": {
-    "dev": "npm uninstall @usefulsensors/moonshine-js && npm install ../../ && npx vite",
+    "dev": "npm uninstall @moonshine-ai/moonshine-js && npm install ../../ && npx vite",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Useful Sensors",
+  "author": "Moonshine AI",
   "license": "MIT",
   "dependencies": {
-    "@usefulsensors/moonshine-js": "file:../..",
+    "@moonshine-ai/moonshine-js": "file:../..",
     "vite": "^6.0.7"
   }
 }

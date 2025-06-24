@@ -91,6 +91,7 @@ class MoonshineSpeechRecognitionResultList
     [index: number]: SpeechRecognitionResult;
 }
 
+// @ts-expect-error
 class MoonshineSpeechRecognition implements SpeechRecognition {
     private transcriber: MicrophoneTranscriber;
 
@@ -99,6 +100,7 @@ class MoonshineSpeechRecognition implements SpeechRecognition {
     }
 
     continuous: boolean;
+    // @ts-expect-error
     grammars: SpeechGrammarList;
     interimResults: boolean;
     lang: string;
