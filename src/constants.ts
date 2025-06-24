@@ -10,6 +10,7 @@ export const Settings = {
     STREAM_UPDATE_INTERVAL: updateInterval,
     STREAM_COMMIT_MIN_INTERVAL: updateInterval * 4,
     STREAM_COMMIT_MAX_INTERVAL: updateInterval * 8,
+    STREAM_COMMIT_EMA_THRESHOLD: 0.5,
     STREAM_COMMIT_EMA_PERIOD: 5,
     VAD_COMMIT_INTERVAL: Math.ceil((vadCommitSeconds * 10000) / frameSize),
     BASE_ASSET_PATH: {
