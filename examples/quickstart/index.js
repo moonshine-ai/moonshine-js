@@ -5,7 +5,11 @@ import * as Moonshine from "https://cdn.jsdelivr.net/npm/@moonshine-ai/moonshine
 const state = document.getElementById("state")
 const button = document.getElementById("button")
 const history = document.getElementById("history")
+const historyWrapper = document.getElementById("historyWrapper")
+
 var pastText = ""
+
+const useVAD = false // transcribers will use streaming mode, rather than VAD chunks
 
 const callbacks = {
     onPermissionsRequested() {
@@ -14,8 +18,8 @@ const callbacks = {
     onError(e) {
         if (e == Moonshine.MoonshineError.PermissionDenied) {
             state.innerHTML = "Permission denied."
-        } else if (e == Moonshine.MoonshineError.NotReceivingAudioInput) {
-            state.innerHTML = "Not receiving audio input."
+        } else {
+            state.innerHTML = "An error occurred."
         }
     },
     onModelLoadStarted() {
@@ -38,12 +42,20 @@ const callbacks = {
             state.innerHTML = "Transcript committed."
             pastText = `${pastText} <br> ${text}`
             history.innerHTML = pastText
+            historyWrapper.scrollTo({
+                top: historyWrapper.scrollHeight,
+                behavior: 'smooth'
+            });
         }
     },
     onTranscriptionUpdated(text) {
         if (text) {
             state.innerHTML = "Transcript updated."
             history.innerHTML = `${pastText} <br> ${text}`
+            historyWrapper.scrollTo({
+                top: historyWrapper.scrollHeight,
+                behavior: 'smooth'
+            });
         }
     },
     onTranscribeStopped() {
@@ -54,21 +66,13 @@ const callbacks = {
 var microphoneTranscriber = new Moonshine.MicrophoneTranscriber(
     "model/base",
     callbacks,
-    false
+    useVAD
 );
 // Start loading the models before the user clicks the button. This
 // isn't strictly necessary since .start() will load the model if it's not
 // already loaded, but it's a good idea to do it in advance so that the user
 // doesn't have to wait for the model to load when they click the button.
-// microphoneTranscriber.load();
-
-var videoTranscriber = new Moonshine.MediaElementTranscriber(
-    document.getElementById("video"),
-    "model/base",
-    callbacks,
-    false // use streaming mode, rather than VAD chunks
-);
-// videoTranscriber.load();
+microphoneTranscriber.load();
 
 button.addEventListener("click", () => {
     if (microphoneTranscriber.isActive) {
@@ -80,3 +84,18 @@ button.addEventListener("click", () => {
         button.innerText = "Stop"
     }
 })
+
+var audioTranscriber = new Moonshine.MediaElementTranscriber(
+    document.getElementById("audio"),
+    "model/base",
+    callbacks,
+    useVAD 
+);
+audioTranscriber.load();
+
+var videoCaptioner = new Moonshine.VideoCaptioner(
+    document.getElementById("video"),
+    "model/base",
+    useVAD
+)
+videoCaptioner.load();
