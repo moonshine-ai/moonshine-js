@@ -60,39 +60,80 @@ class VideoCaptioner extends MediaElementTranscriber {
     public constructor(
         videoElement: HTMLVideoElement,
         modelURL: string,
-        useVAD: boolean = false
+        useVAD: boolean = false,
+        wrapperStyle: Partial<CSSStyleDeclaration> = {},
+        captionsStyle: Partial<CSSStyleDeclaration> = {},
+        commitElementStyle: Partial<CSSStyleDeclaration> = {},
+        updateElementStyle: Partial<CSSStyleDeclaration> = {}
     ) {
         super(videoElement, modelURL, {}, useVAD);
 
         const parentHeight = videoElement.clientHeight;
         const parentWidth = videoElement.clientWidth;
-
-        const wrapper = document.createElement("div");
-        wrapper.style.display = "inline-block";
-        wrapper.style.position = "relative";
-        wrapper.style.width = `${parentWidth}`;
-        wrapper.style.height = `${parentHeight}`;
-
         const baseSize = Math.min(parentWidth, parentHeight);
         const fontSize = baseSize * 0.05;
+        const margin = baseSize * 0.15;
+        
+        let defaultWrapperStyle = {
+            display: "inline-block",
+            position: "relative",
+            width: `${parentWidth}px`,
+            height: `${parentHeight}px`,
+        };
+    
+        let defaultCaptionsStyle = {
+            position: "absolute",
+            bottom: `${(parentHeight/3) - (fontSize*3)}px`,
+            color: "#ffffff",
+            fontSize: `${fontSize}px`,
+            fontFamily: "sans-serif",
+            zIndex: "2",
+            height: `${fontSize * 3}px`,
+            width: `${parentWidth - (margin * 2)}px`,
+            textAlign: "center",
+            marginLeft: `${margin}px`,
+            marginRight: `${margin}px`,
+            lineHeight: `${fontSize * 1.5}px`,
+        };
+
+        let defaultUpdateElementStyle = {
+            color: "#aaaaaa",
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+        };
+
+        let defaultCommitElementStyle = {
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+        };
+
+        function camelToDash(str: string) {
+            return str.replace(/[A-Z]/g, m => '-' + m.toLowerCase());
+        }
+        function assignDashCaseStyle(styleObj: Partial<CSSStyleDeclaration>, target: CSSStyleDeclaration) {
+            for (const key in styleObj) {
+                if (Object.prototype.hasOwnProperty.call(styleObj, key)) {
+                    const dashKey = camelToDash(key);
+                    // @ts-ignore
+                    target.setProperty(dashKey, styleObj[key]);
+                }
+            }
+        }
+
+        const wrapper = document.createElement("div");
+        assignDashCaseStyle(defaultWrapperStyle, wrapper.style);
+        assignDashCaseStyle(wrapperStyle, wrapper.style);
 
         const captionsWrapper = document.createElement("div");
-        captionsWrapper.style.position = "absolute";
-        captionsWrapper.style.bottom = `${(parentHeight/3) - (fontSize*3)}px`;
-        captionsWrapper.style.color = "#ffffff";
-        captionsWrapper.style.fontSize = `${fontSize}px`;
-        captionsWrapper.style.fontFamily = "sans-serif";
-        captionsWrapper.style.zIndex = "2";
-        captionsWrapper.style.height = `${fontSize * 3}px`;
-        captionsWrapper.style.width = `${parentWidth}`;
+        assignDashCaseStyle(defaultCaptionsStyle, captionsWrapper.style);
+        assignDashCaseStyle(captionsStyle, captionsWrapper.style);
 
         const commitElement = document.createElement("span");
-        commitElement.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
+        assignDashCaseStyle(defaultCommitElementStyle, commitElement.style);
+        assignDashCaseStyle(commitElementStyle, commitElement.style);
         captionsWrapper.appendChild(commitElement);
 
         const updateElement = document.createElement("span");
-        updateElement.style.color = "#aaaaaa";
-        updateElement.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
+        assignDashCaseStyle(defaultUpdateElementStyle, updateElement.style);
+        assignDashCaseStyle(updateElementStyle, updateElement.style);
         captionsWrapper.appendChild(updateElement);
 
         videoElement.parentElement.insertBefore(wrapper, videoElement);
