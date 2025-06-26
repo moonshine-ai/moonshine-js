@@ -156,7 +156,9 @@ class VideoCaptioner extends MediaElementTranscriber {
         }
 
         this.callbacks.onTranscriptionUpdated = function (text) {
-            if (text) setCaption(text, 60, 2);
+            if (text && !useVAD) {
+                setCaption(text, 60, 2);
+            }
         };
         this.callbacks.onTranscriptionCommitted = function (text) {
             setCaption(text, 60, 2, true);
