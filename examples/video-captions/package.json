@@ -1,0 +1,16 @@
+{
+  "name": "video-captions",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Moonshine AI",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "@moonshine-ai/moonshine-js": "file:../..",
+    "vite": "^6.3.4"
+  }
+}
