@@ -44,7 +44,7 @@ import * as Moonshine from "https://cdn.jsdelivr.net/npm/@moonshine-ai/moonshine
 var transcriber = new Moonshine.MicrophoneTranscriber(
     "model/tiny", // the fastest and smallest Moonshine model
     {
-        onTranscriptionUpdated(text) {
+        onTranscriptionCommitted(text) {
             console.log(text);
         },
     }
@@ -53,26 +53,32 @@ var transcriber = new Moonshine.MicrophoneTranscriber(
 transcriber.start();
 ```
 
-When we start the transcriber, the browser will request mic permissions and begin printing everything the user says to the console. It is useful in some cases to wait
-until the user has stopped speaking to transcribe their words. In this case, we'll enable voice activity detection (VAD) when we create the transcriber:
+When we start the transcriber, the browser will request mic permissions and begin printing everything the user says to the console. By default,
+the transcriber uses voice activity detection (VAD) to determine when to transcribe speech. It will wait until long pauses in speech to output a transcript.
 
-```javascript {hl_lines=[8],linenostart=1}
+MoonshineJS also supports a streaming mode, where the transcript is continually updated as you speak. To do that, we disable VAD mode and add a new 
+callback that will continually receive the latest update to the transcript:
+
+```javascript {hl_lines=[7,8,9,10,11],linenostart=1}
 var transcriber = new Moonshine.MicrophoneTranscriber(
     "model/tiny",
     {
+        onTranscriptionCommitted(text) {
+            console.log(`commit: ${text}`)
+        }
         onTranscriptionUpdated(text) {
-            console.log(text);
+            console.log(`update: ${text}`)
         },
     },
-    true // enable voice activity detection
+    false // disable VAD for streaming mode
 );
 
 transcriber.start();
 ```
 
-Now the transcription will only update between pauses in speech.
+Now the transcription will continually update between pauses in speech, and commit when you stop talking. 
 
-That's all it takes to get started! Read [the guides](https://moonshine-ai.github.io/moonshine-js/) to learn how to transcribe audio from other sources, or to build voice-controlled applications.
+That's all it takes to get started! Read [the guides](https://dev.moonshine.ai/js/guide) to learn how to transcribe audio from other sources, or to build voice-controlled applications.
 
 ## Web Speech Polyfill
 
