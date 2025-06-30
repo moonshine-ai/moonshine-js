@@ -314,8 +314,8 @@ class Transcriber {
                             .then((text) => {
                                 this.callbacks.onTranscriptionUpdated(text);
                             })
-                            .catch(() => {
-                                Log.error("Generation misfire.");
+                            .catch((err) => {
+                                Log.error("Generation misfire.", err);
                             });
                     }
                     // commit
@@ -333,8 +333,8 @@ class Transcriber {
                                     );
                                 }
                             })
-                            .catch(() => {
-                                Log.error("Generation misfire.");
+                            .catch((err) => {
+                                Log.error("Generation misfire: " + err);
                             });
                     }
                 }
