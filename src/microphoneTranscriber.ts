@@ -53,9 +53,10 @@ class MicrophoneTranscriber extends Transcriber {
     public constructor(
         modelURL: string,
         callbacks: Partial<TranscriberCallbacks> = {},
-        useVAD: boolean = true
+        useVAD: boolean = true,
+        precision: string = "float"
     ) {
-        super(modelURL, callbacks, useVAD);
+        super(modelURL, callbacks, useVAD, precision);
     }
 
     /**

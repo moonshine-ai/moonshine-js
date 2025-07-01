@@ -265,13 +265,14 @@ class Transcriber {
     public constructor(
         modelURL: string,
         callbacks: Partial<TranscriberCallbacks> = {},
-        useVAD: boolean = true
+        useVAD: boolean = true,
+        precision: string = "float"
     ) {
         this.callbacks = { ...defaultTranscriberCallbacks, ...callbacks };
         // we want to avoid re-downloading the same model weights if we can avoid it
         // so we only create a new model of the requested type if it hasn't been already
         if (!Transcriber.models.has(modelURL))
-            Transcriber.models.set(modelURL, new MoonshineModel(modelURL));
+            Transcriber.models.set(modelURL, new MoonshineModel(modelURL, precision));
         this.sttModel = Transcriber.models.get(modelURL);
         this.useVAD = useVAD;
         this.audioContext = new AudioContext();
@@ -315,7 +316,7 @@ class Transcriber {
                                 this.callbacks.onTranscriptionUpdated(text);
                             })
                             .catch((err) => {
-                                Log.error("Generation misfire.", err);
+                                Log.error("Generation misfire: " + err);
                             });
                     }
                     // commit

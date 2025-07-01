@@ -14,9 +14,10 @@ class MediaElementTranscriber extends Transcriber {
         mediaElement: HTMLMediaElement,
         modelURL: string,
         callbacks: Partial<TranscriberCallbacks> = {},
-        useVAD: boolean = true
+        useVAD: boolean = true,
+        precision: string = "float"
     ) {
-        super(modelURL, callbacks, useVAD);
+        super(modelURL, callbacks, useVAD, precision);
         this.mediaElement = mediaElement;
         this.mediaElement.addEventListener("play", () => {
             this.start();
@@ -64,9 +65,10 @@ class VideoCaptioner extends MediaElementTranscriber {
         wrapperStyle: Partial<CSSStyleDeclaration> = {},
         captionsStyle: Partial<CSSStyleDeclaration> = {},
         commitElementStyle: Partial<CSSStyleDeclaration> = {},
-        updateElementStyle: Partial<CSSStyleDeclaration> = {}
+        updateElementStyle: Partial<CSSStyleDeclaration> = {},
+        precision: string = "float"
     ) {
-        super(videoElement, modelURL, {}, useVAD);
+        super(videoElement, modelURL, {}, useVAD, precision);
 
         const parentHeight = videoElement.clientHeight;
         const parentWidth = videoElement.clientWidth;
