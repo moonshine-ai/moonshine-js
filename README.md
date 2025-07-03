@@ -6,6 +6,8 @@ MoonshineJS makes it easy for web developers to build modern, speech-driven web 
 -   **Easy Voice Control**: build feature-rich voice-controlled web apps in < 10 lines of code.
 -   **Local Processing**: all audio processing happens locally in the user's web browser—no cloud services or privacy violations required.
 
+Full documentation is available at [dev.moonshine.ai](https://dev.moonshine.ai/).
+
 _Note: This package is currently in beta, and breaking changes may occur between versions. User feedback and developer contributions are welcome._
 
 ## Installation
