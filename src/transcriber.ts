@@ -266,7 +266,7 @@ class Transcriber {
         modelURL: string,
         callbacks: Partial<TranscriberCallbacks> = {},
         useVAD: boolean = true,
-        precision: string = "float"
+        precision: string = "quantized"
     ) {
         this.callbacks = { ...defaultTranscriberCallbacks, ...callbacks };
         // we want to avoid re-downloading the same model weights if we can avoid it

@@ -15,7 +15,7 @@ class MediaElementTranscriber extends Transcriber {
         modelURL: string,
         callbacks: Partial<TranscriberCallbacks> = {},
         useVAD: boolean = true,
-        precision: string = "float"
+        precision: string = "quantized"
     ) {
         super(modelURL, callbacks, useVAD, precision);
         this.mediaElement = mediaElement;
@@ -66,7 +66,7 @@ class VideoCaptioner extends MediaElementTranscriber {
         captionsStyle: Partial<CSSStyleDeclaration> = {},
         commitElementStyle: Partial<CSSStyleDeclaration> = {},
         updateElementStyle: Partial<CSSStyleDeclaration> = {},
-        precision: string = "float"
+        precision: string = "quantized"
     ) {
         super(videoElement, modelURL, {}, useVAD, precision);
 

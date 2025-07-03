@@ -54,7 +54,7 @@ class MicrophoneTranscriber extends Transcriber {
         modelURL: string,
         callbacks: Partial<TranscriberCallbacks> = {},
         useVAD: boolean = true,
-        precision: string = "float"
+        precision: string = "quantized"
     ) {
         super(modelURL, callbacks, useVAD, precision);
     }
