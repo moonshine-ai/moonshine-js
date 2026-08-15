@@ -1,3 +1,5 @@
+**This project is now deprecated in favor of [Moonshine Voice's Javascript support](https://github.com/moonshine-ai/moonshine), and has been archived.**
+
 # MoonshineJS
 
 MoonshineJS makes it easy for web developers to build modern, speech-driven web experiences without sacrificing user privacy. We build on three key principles:
